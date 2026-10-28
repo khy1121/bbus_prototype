@@ -2,6 +2,7 @@ import { vi } from 'vitest'
 import {
   generatePlaylist,
   getBalanceQuestions,
+  getCurrentLocation,
   getRestStops,
   getRoute,
   getQuizQuestions,
@@ -22,6 +23,14 @@ describe('drive api (mock)', () => {
     expect(await searchPlaces('없는장소zzz')).toEqual([])
   })
 
+  it('getCurrentLocation 은 GPS 좌표와 카카오 지역명을 돌려준다 (목업 고정값 아님)', async () => {
+    const { locate } = await import('@/lib/location')
+    vi.mocked(locate).mockResolvedValueOnce({ lat: 35.1796, lng: 129.0756 })
+    const loc = await getCurrentLocation({ fresh: true })
+    expect(loc.position).toEqual({ lat: 35.1796, lng: 129.0756 })
+    expect(loc.address).toBe('서초구 서초동') // 테스트 setup 의 역지오코딩 목업
+  })
+
   describe('getRoute (카카오모빌리티 길찾기)', () => {
     afterEach(() => vi.unstubAllGlobals())
 
@@ -38,9 +47,10 @@ describe('drive api (mock)', () => {
       })
       vi.stubGlobal('fetch', fetchMock)
 
-      const route = await getRoute({ position: { lat: 37.34, lng: 126.68 } })
+      const route = await getRoute({ lat: 37.5, lng: 127.1 }, { position: { lat: 37.34, lng: 126.68 } })
       const url = new URL(fetchMock.mock.calls[0][0], 'http://x')
       expect(url.pathname).toBe('/api/directions')
+      expect(url.searchParams.get('origin')).toBe('37.5,127.1')
       expect(url.searchParams.get('destination')).toBe('37.34,126.68')
       expect(route.path).toEqual(roadPath)
       expect(route).toMatchObject({ distanceKm: 42.3, durationMin: 51 })
@@ -53,7 +63,7 @@ describe('drive api (mock)', () => {
 
     it('길찾기 API 를 쓸 수 없으면(키 없음·네트워크 오류) 목업 경로로 대체한다', async () => {
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({}) }))
-      const route = await getRoute({ position: { lat: 37.34, lng: 126.68 } })
+      const route = await getRoute({ lat: 37.5, lng: 127.1 }, { position: { lat: 37.34, lng: 126.68 } })
       expect(route.path.length).toBeGreaterThan(1)
       expect(route.distanceKm).toBeGreaterThan(0)
     })
@@ -61,7 +71,7 @@ describe('drive api (mock)', () => {
 
   it('getRoute 는 경로와 경로 위 휴게소를 돌려준다', async () => {
     const [place] = await searchPlaces('오이도')
-    const route = await getRoute(place)
+    const route = await getRoute({ lat: 37.4837, lng: 127.0324 }, place)
     expect(route.path.length).toBeGreaterThan(1)
     expect(route.restStops.length).toBeGreaterThan(0)
     expect(route.distanceKm).toBeGreaterThan(0)

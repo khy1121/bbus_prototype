@@ -2,6 +2,24 @@
 declare namespace kakao.maps {
   function load(callback: () => void): void
 
+  namespace services {
+    enum Status {
+      OK = 'OK',
+      ZERO_RESULT = 'ZERO_RESULT',
+      ERROR = 'ERROR',
+    }
+    class Geocoder {
+      coord2RegionCode(
+        lng: number,
+        lat: number,
+        callback: (
+          result: { region_type: string; region_2depth_name: string; region_3depth_name: string }[],
+          status: Status,
+        ) => void,
+      ): void
+    }
+  }
+
   namespace event {
     function addListener(target: unknown, type: string, handler: () => void): void
     function removeListener(target: unknown, type: string, handler: () => void): void

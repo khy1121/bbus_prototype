@@ -1,6 +1,7 @@
 import type { PlaceSummary } from '@/components'
 import type { LatLng } from '@/components/KakaoMap/KakaoMap'
 import { cumulativeKm, haversineKm, pointAtKm } from '@/lib/geo'
+import { locate, reverseGeocodeRegion } from '@/lib/location'
 import {
   BALANCE_QUESTIONS,
   djScript,
@@ -9,8 +10,6 @@ import {
   MOCK_POPULAR_ROUTES,
   MOCK_REST_STOPS,
   MOCK_TRACKS,
-  MY_ADDRESS,
-  MY_POSITION,
   QUIZ_QUESTIONS,
   RANDOM_STORIES,
 } from './mocks'
@@ -31,9 +30,28 @@ import type {
  * 현재는 목업을 돌려준다. 실제 연동 시 함수 시그니처는 유지하고 내부만 교체한다.
  */
 
-// TODO(backend): GPS + 카카오 로컬 API(coord2address) 로 현재 위치/주소 조회
-export async function getCurrentLocation(): Promise<{ position: LatLng; address: string }> {
-  return { position: MY_POSITION, address: MY_ADDRESS }
+export type CurrentLocation = { position: LatLng; address: string }
+
+let lastLocation: { at: number; value: Promise<CurrentLocation> } | null = null
+const LOCATION_TTL_MS = 30_000
+
+/**
+ * 현재 위치 = 브라우저 GPS 좌표 + 카카오 역지오코딩 지역명('서초구 서초동').
+ * 여러 화면에서 연달아 부르므로 30초 동안은 같은 결과를 재사용한다.
+ * 위치 권한이 없거나 찾지 못하면 LocationError 로 reject.
+ */
+export function getCurrentLocation({ fresh = false }: { fresh?: boolean } = {}): Promise<CurrentLocation> {
+  if (!fresh && lastLocation && Date.now() - lastLocation.at < LOCATION_TTL_MS) return lastLocation.value
+  const value = locate().then(async (position) => ({
+    position,
+    // 지역명은 부가 정보 — 실패해도 좌표는 쓴다
+    address: await reverseGeocodeRegion(position).catch(() => ''),
+  }))
+  lastLocation = { at: Date.now(), value }
+  value.catch(() => {
+    if (lastLocation?.value === value) lastLocation = null
+  })
+  return value
 }
 
 // TODO(backend): 카카오 로컬 API 키워드 검색 (거리순 정렬)
@@ -85,8 +103,8 @@ function mockDirections(from: LatLng, to: LatLng): DirectionsResponse {
  * 출발지(현재 위치) → 목적지 경로. 카카오모빌리티 길찾기로 실제 도로를 따라가는 좌표를 받는다.
  * TODO(backend): 경로 내 실제 휴게소 조회 (현재는 목업 휴게소를 경로 위 일정 비율 지점에 배치)
  */
-export async function getRoute(destination: { position: LatLng }): Promise<DriveRoute> {
-  const from = MY_POSITION
+export async function getRoute(origin: LatLng, destination: { position: LatLng }): Promise<DriveRoute> {
+  const from = origin
   const to = destination.position
   let directions: DirectionsResponse
   try {
