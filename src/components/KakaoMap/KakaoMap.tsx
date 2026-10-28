@@ -64,15 +64,34 @@ export function KakaoMap({
     getKakaoMapKey() ? 'loading' : 'unavailable',
   )
 
-  // iOS 사파리/인앱 브라우저: 지도 위 핀치를 페이지 확대(gesture 이벤트)가 가로채지 않게 막는다.
-  // 지도 영역에만 적용 — 다른 화면에서는 사용자가 페이지를 확대할 수 있어야 한다(접근성).
+  // 모바일: 지도 위 핀치가 지도 확대 대신 브라우저(페이지) 확대로 처리되지 않게 막는다.
+  // 지도 화면에만 적용 — 다른 화면에서는 사용자가 페이지를 확대할 수 있어야 한다(접근성).
   useEffect(() => {
     const root = rootRef.current
     if (!root || !interactive) return
     const prevent = (e: Event) => e.preventDefault()
-    const types = ['gesturestart', 'gesturechange', 'gestureend']
-    types.forEach((t) => root.addEventListener(t, prevent, { passive: false }))
-    return () => types.forEach((t) => root.removeEventListener(t, prevent))
+    // 두 손가락 이동 = 핀치. 한 손가락(지도 이동)은 건드리지 않는다
+    const preventPinch = (e: Event) => {
+      if ((e as TouchEvent).touches?.length > 1) e.preventDefault()
+    }
+    // 카카오맵이 내부에서 이벤트 전파를 멈춰도 막을 수 있도록 캡처 단계에서 처리 (지도 동작은 그대로)
+    const opts = { capture: true, passive: false } as const
+    const gestures = ['gesturestart', 'gesturechange', 'gestureend']
+    gestures.forEach((t) => root.addEventListener(t, prevent, opts))
+    root.addEventListener('touchmove', preventPinch, opts)
+
+    // 카카오톡 등 인앱 브라우저(WKWebView)는 viewport 확대 제한을 따른다 — 지도 화면에 있는 동안만 잠금
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+    const original = meta?.content
+    if (meta && original !== undefined) {
+      meta.content = `${original}, maximum-scale=1, user-scalable=no`
+    }
+
+    return () => {
+      gestures.forEach((t) => root.removeEventListener(t, prevent, opts))
+      root.removeEventListener('touchmove', preventPinch, opts)
+      if (meta && original !== undefined) meta.content = original
+    }
   }, [interactive])
 
   // 지도 생성

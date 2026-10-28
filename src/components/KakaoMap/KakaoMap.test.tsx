@@ -47,4 +47,35 @@ describe('KakaoMap 터치 제스처', () => {
     expect(event.defaultPrevented).toBe(false)
     expect(map.className).not.toMatch(/interactive/)
   })
+
+  function touchMove(target: Element, fingers: number) {
+    const event = new Event('touchmove', { bubbles: true, cancelable: true })
+    Object.defineProperty(event, 'touches', { value: Array.from({ length: fingers }, () => ({})) })
+    target.dispatchEvent(event)
+    return event
+  }
+
+  it('두 손가락 터치 이동은 페이지 확대로 새지 않게 막고, 한 손가락은 그대로 둔다 — 지도 내부 요소에서 시작해도', () => {
+    render(<KakaoMap label="지도" center={{ lat: 37.5, lng: 127 }} />)
+    const map = screen.getByRole('region', { name: '지도' })
+    // 카카오맵이 이벤트 전파를 멈춰도 막을 수 있도록 캡처 단계에서 처리
+    const inner = map.firstElementChild!
+    inner.addEventListener('touchmove', (e) => e.stopPropagation())
+    expect(touchMove(inner, 2).defaultPrevented).toBe(true)
+    expect(touchMove(inner, 1).defaultPrevented).toBe(false)
+  })
+
+  it('지도 화면에 있는 동안만 브라우저 확대를 잠그고, 나가면 원래 viewport 로 되돌린다', () => {
+    const meta = document.createElement('meta')
+    meta.name = 'viewport'
+    meta.content = 'width=device-width, initial-scale=1.0'
+    document.head.appendChild(meta)
+
+    const { unmount } = render(<KakaoMap label="지도" center={{ lat: 37.5, lng: 127 }} />)
+    expect(meta.content).toContain('maximum-scale=1')
+    expect(meta.content).toContain('user-scalable=no')
+    unmount()
+    expect(meta.content).toBe('width=device-width, initial-scale=1.0')
+    meta.remove()
+  })
 })
