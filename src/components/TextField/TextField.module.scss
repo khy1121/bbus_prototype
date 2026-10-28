@@ -1,0 +1,117 @@
+.hiddenLabel {
+  @include visually-hidden;
+}
+
+// ---------- TextField (Figma 10:14305) ----------
+.field {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  height: 47px;
+  padding: 0 14px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  background: var(--color-white);
+  color: var(--color-black);
+  caret-color: var(--color-coral);
+  @include typo('body-m-medium');
+  outline: none;
+  transition: border-color $duration-fast ease;
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:focus {
+    border-color: var(--color-coral-2);
+  }
+}
+
+// ---------- TextArea (Figma 10:14256) ----------
+.areaField {
+  position: relative;
+  width: 100%;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  min-height: 268px;
+  padding: 14px 15px 36px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  background: var(--color-white);
+  caret-color: var(--color-coral);
+  resize: none;
+  @include typo('body-s');
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:focus {
+    border-color: var(--color-coral-2);
+  }
+}
+
+.counter {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  @include typo('caption');
+  color: var(--color-coral);
+}
+
+// ---------- SearchField ----------
+.search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.pill {
+  height: 39px;
+  padding: 0 12px 0 15px;
+  border-radius: $radius-full;
+  background: var(--color-coral-background);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.box {
+  height: 48px;
+  padding: 0 14px 0 15px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  background: var(--color-white);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  caret-color: var(--color-coral);
+  @include typo('body-s');
+  color: var(--color-black);
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-gray-600);
+  }
+
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+.searchButton {
+  @include focus-ring;
+  display: inline-flex;
+  flex-shrink: 0;
+}
