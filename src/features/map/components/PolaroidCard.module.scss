@@ -1,0 +1,66 @@
+.card {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 13px 14px 14px;
+  border-radius: 10px;
+  background: var(--color-coral-background);
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.2));
+  text-align: left;
+}
+
+.md {
+  width: 269px;
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 242 / 251;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  padding: 0 5px;
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.date {
+  @include typo('caption');
+  color: var(--color-coral-stroke);
+}
+
+// 공유 시트 썸네일 86×107 (Figma 10:15451 를 데이터로 렌더링)
+.sm {
+  width: 86px;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 0;
+  background: var(--color-white);
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.15));
+
+  .photo {
+    border-radius: 2px;
+  }
+
+  .texts {
+    padding: 0 1px;
+  }
+
+  .title {
+    font-size: 6px;
+    font-weight: $weight-semibold;
+  }
+
+  .date {
+    font-size: 5px;
+  }
+}

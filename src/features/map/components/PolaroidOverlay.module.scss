@@ -1,0 +1,53 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn $duration-base ease;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 33px;
+  animation: popIn $duration-base $ease-out;
+}
+
+.share {
+  align-self: flex-end;
+  // Figma: 카드 우측 상단 바깥 (x 329) 에 위치
+  margin-right: -35px;
+  margin-bottom: -5px;
+}
+
+.card {
+  transition: transform $duration-fast ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.hint {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
