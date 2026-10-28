@@ -1,0 +1,33 @@
+@use '../styles/drive' as *;
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0;
+}
+
+.item {
+  @include glass(74deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  height: 81px;
+  padding: 10px 6px 13px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.label {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+
+.value {
+  margin: 0;
+  @include typo('body-l-bold');
+  color: var(--color-gray-900);
+  white-space: nowrap;
+}
