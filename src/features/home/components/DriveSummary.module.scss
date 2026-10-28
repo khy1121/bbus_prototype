@@ -48,6 +48,5 @@
 
 .note {
   @include typo('caption');
-  font-weight: $weight-regular;
   color: var(--color-gray-800);
 }

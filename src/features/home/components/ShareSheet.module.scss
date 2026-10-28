@@ -87,7 +87,8 @@
   flex-direction: column;
   align-items: center;
   gap: 9px;
-  width: 60px;
+  // Figma: 아이콘 폭 57 기준, 긴 라벨(인스타그램)만 60
+  min-width: 57px;
   @include typo('body-s');
   color: var(--color-black);
 

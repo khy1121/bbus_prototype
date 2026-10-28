@@ -22,7 +22,8 @@
 .chips {
   display: flex;
   gap: 12px;
-  margin-top: 17px;
+  // Figma: 제목 아래 17px (칩 그림자용 위 패딩 5px 포함)
+  margin-top: 12px;
   padding: 5px 25px;
   overflow-x: auto;
   @include hide-scrollbar;
