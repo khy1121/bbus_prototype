@@ -6,9 +6,10 @@ import { DriveStartSheet } from '@/features/drive-start/DriveStartSheet'
 import { LocationPermissionDialog } from '@/features/permissions/LocationPermissionDialog'
 import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { cumulativeKm, pointAtKm } from '@/lib/geo'
+import { headingAlongPath, toDirection, type Direction } from '@/lib/heading'
 import { useDriveStore } from '@/stores/driveStore'
 import { getRestStops, getCurrentLocation } from '../api'
-import { icons, images } from '../assets'
+import { carByDirection, icons, images } from '../assets'
 import { ContentPanel } from '../components/ContentPanel'
 import { DriveStatsCard } from '../components/DriveStatsCard'
 import { GlassButton } from '../components/GlassButton'
@@ -42,9 +43,10 @@ function useSheetHeights(): Record<SnapPoint, number> {
  * 지도 마커 이미지. 크기를 고정해 두어야 이미지가 로드되기 전(높이 0)에 앵커가 어긋났다가 튀는 일이 없다.
  * 원본은 2~3배 해상도라 확대해도 선명하다.
  */
-function imageMarker(src: string, width: number, height: number, label?: string) {
+function imageMarker(src: string, width: number, height: number, label?: string, direction?: Direction) {
   return () => {
     const el = document.createElement('img')
+    if (direction) el.dataset.direction = direction
     el.src = src
     el.alt = label ?? ''
     el.width = width
@@ -92,6 +94,8 @@ export function DrivePage() {
   // 경로를 따라 실제 거리 비율만큼 이동한 지점 (길찾기 좌표는 점 간격이 고르지 않음)
   const carPosition =
     route && pathKm ? pointAtKm(route.path, pathKm[pathKm.length - 1] * progress, pathKm) : myPosition
+  const carDirection: Direction =
+    route && pathKm ? toDirection(headingAlongPath(route.path, pathKm[pathKm.length - 1] * progress, pathKm)) : 'N'
   const stats = hasRoute
     ? {
         elapsedSec,
@@ -124,9 +128,16 @@ export function DrivePage() {
         onClick: () => setSelectedStop(stop),
       })),
       { id: 'dest', position: destination.position, render: imageMarker(images.heartMarker, 54, 53, destination.name) },
-      { id: 'car', position: carPosition, render: imageMarker(images.carMarker, 53, 49, '현재 위치'), zIndex: 10 },
+      {
+        id: 'car',
+        position: carPosition,
+        // 진행 방향이 바뀔 때만 이미지를 교체 (오버레이는 유지)
+        contentKey: carDirection,
+        render: imageMarker(carByDirection[carDirection], 53, 49, '현재 위치', carDirection),
+        zIndex: 10,
+      },
     ]
-  }, [route, destination, myPosition, carPosition])
+  }, [route, destination, myPosition, carPosition, carDirection])
 
   const restStopAlert =
     hasRoute && status === 'driving' ? findRestStopAlert(route!, route!.distanceKm * progress, dismissedRestStopIds) : null

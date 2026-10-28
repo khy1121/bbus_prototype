@@ -3,6 +3,8 @@ import { vi } from 'vitest'
 import { useDriveStore } from '@/stores/driveStore'
 import { useDriveSessionStore } from '../stores/driveSessionStore'
 import { renderDrive } from '../test-utils'
+import { cumulativeKm } from '@/lib/geo'
+import { headingAlongPath, toDirection } from '@/lib/heading'
 
 vi.mock('@/components/KakaoMap/KakaoMap', async () => (await import('@/test/fakeKakaoMap')).fakeKakaoMapModule)
 
@@ -29,5 +31,17 @@ describe('DrivePage — 차량 따라가기', () => {
 
     await user.click(screen.getByRole('button', { name: '현재 위치' }))
     await waitFor(() => expect(mapCenter()).not.toBe(moved)) // 다시 차량 위치로
+  })
+
+  it('차량 마커는 경로상 진행 방향(8방향)에 맞는 이미지를 쓴다', async () => {
+    useDriveStore.getState().startDrive({ name: 'a', destination })
+    renderDrive()
+    await waitFor(() => expect(useDriveSessionStore.getState().route).not.toBeNull())
+    advance(120)
+    const car = await screen.findByRole('img', { name: '현재 위치' })
+    const route = useDriveSessionStore.getState().route!
+    const { routeProgress } = await import('../stores/driveSessionStore')
+    const km = cumulativeKm(route.path).at(-1)! * routeProgress(route, useDriveSessionStore.getState().elapsedSec)
+    expect(car).toHaveAttribute('data-direction', toDirection(headingAlongPath(route.path, km)))
   })
 })

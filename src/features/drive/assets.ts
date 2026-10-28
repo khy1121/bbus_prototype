@@ -1,4 +1,5 @@
 // 드라이브 모드 전용 에셋 (Figma DriveMode_Components 에서 export)
+import type { Direction } from '@/lib/heading'
 import route from './assets/icons/route.svg'
 import locate from './assets/icons/locate.svg'
 import exit from './assets/icons/exit.svg'
@@ -112,4 +113,19 @@ export const images = {
   stampBoard,
   stampLocked,
   stampPink,
+}
+
+/**
+ * 진행 방향별 차량 마커 (8방향). 방향별 일러스트가 준비되면 각 방향의 import 만 바꾸면 된다.
+ * TODO(asset): 방향별 이미지 — 현재는 모든 방향이 기본 차량 이미지
+ */
+export const carByDirection: Record<Direction, string> = {
+  N: carMarker,
+  NE: carMarker,
+  E: carMarker,
+  SE: carMarker,
+  S: carMarker,
+  SW: carMarker,
+  W: carMarker,
+  NW: carMarker,
 }
