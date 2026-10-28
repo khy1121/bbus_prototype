@@ -90,7 +90,7 @@ export function SearchPage() {
   const openPreview = (nextFrom: Endpoint, nextTo: Endpoint) => {
     if (nextTo.kind === 'empty' || nextFrom.kind === 'empty') return false
     if (nextFrom.kind === 'me' && nextTo.kind === 'me') return false
-    navigate(`/drive/route/${endpointId(nextTo)}?from=${endpointId(nextFrom)}`)
+    navigate(`/drive/route/${endpointId(nextTo)}?from=${endpointId(nextFrom)}`, { state: { fromSearch: true } })
     return true
   }
 

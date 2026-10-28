@@ -58,6 +58,17 @@ describe('SearchPage (02 / 03)', () => {
     expect(useDriveStore.getState().status).toBe('driving')
   })
 
+  it('경로 미리보기: 출발/도착 바꾸기, 칸을 누르면 검색으로 돌아간다 (Figma 10:16587)', async () => {
+    const { user, router } = renderDrive('/drive/route/oido')
+    expect(await screen.findByTestId('route-from')).toHaveTextContent('내 위치')
+    expect(await screen.findByTestId('route-to')).toHaveTextContent('시흥 오이도')
+    await user.click(screen.getByRole('button', { name: '출발지와 도착지 바꾸기' }))
+    expect(router.state.location.pathname).toBe('/drive/route/me')
+    expect(router.state.location.search).toBe('?from=oido')
+    await user.click(screen.getByRole('button', { name: '닫기' }))
+    expect(router.state.location.pathname).not.toBe('/drive/route/me')
+  })
+
   it('X 버튼은 드라이브 화면으로 돌아간다', async () => {
     const { user, router } = renderDrive('/drive/search')
     await user.click(screen.getByRole('button', { name: '닫기' }))

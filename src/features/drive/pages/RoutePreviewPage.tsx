@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { Button, EmptyState, IconButton } from '@/components'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { EmptyState } from '@/components'
 import { KakaoMap } from '@/components/KakaoMap/KakaoMap'
 import { LocationPermissionDialog } from '@/features/permissions/LocationPermissionDialog'
 import { useDriveStore, type Destination } from '@/stores/driveStore'
 import { getCurrentLocation, getPlace, getRoute } from '../api'
+import { icons } from '../assets'
 import type { DriveRoute } from '../types'
 import styles from './RoutePreviewPage.module.scss'
 
@@ -28,6 +29,7 @@ export function RoutePreviewPage() {
   const [params] = useSearchParams()
   const fromId = params.get('from') ?? ME_ID
   const navigate = useNavigate()
+  const location = useLocation()
   const { setOrigin, setDestination } = useDriveStore()
 
   const [from, setFrom] = useState<Endpoint | null>(null)
@@ -64,10 +66,16 @@ export function RoutePreviewPage() {
     navigate('/drive')
   }
 
-  const label = (e: Endpoint | null) =>
+  // 출발/도착 바꾸기 → 바뀐 경로로 다시 미리보기
+  const swap = () => navigate(`/drive/route/${fromId}?from=${placeId}`, { replace: true, state: location.state })
+  // 닫기 → 검색 화면으로 (검색에서 왔으면 뒤로, 링크로 바로 들어왔다면 검색 화면을 새로 연다)
+  const fromSearch = (location.state as { fromSearch?: boolean } | null)?.fromSearch
+  const close = () => (fromSearch ? navigate(-1) : navigate('/drive/search'))
+
+  const label = (e: Endpoint | null | undefined) =>
     e?.isMe ? (
       <>
-        내 위치 <span>{e.address && `(${e.address})`}</span>
+        내 위치 {e.address && <span className={styles.address}>{`(${e.address})`}</span>}
       </>
     ) : (
       e?.name
@@ -75,13 +83,6 @@ export function RoutePreviewPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.summary}>
-        <IconButton icon="back" label="뒤로가기" variant="plain" onClick={() => navigate(-1)} />
-        <div className={styles.texts}>
-          <p className={styles.from}>{label(from)}</p>
-          <p className={styles.to}>{label(to ?? null)}</p>
-        </div>
-      </div>
       <div className={styles.map}>
         {to && (
           <KakaoMap
@@ -93,11 +94,30 @@ export function RoutePreviewPage() {
           />
         )}
       </div>
-      <div className={styles.footer}>
-        <Button size="lg" fullWidth onClick={handleConfirm} disabled={!from || !to}>
-          경로 설정하기
-        </Button>
+
+      {/* 출발지/도착지 박스 — 장소 검색 화면과 같은 모양 (Figma 10:16590) */}
+      <div className={styles.routeBox}>
+        <img className={styles.routeDots} src={icons.routeDots} alt="" aria-hidden />
+        <button type="button" className={styles.swap} aria-label="출발지와 도착지 바꾸기" onClick={swap}>
+          <img src={icons.swap} alt="" aria-hidden />
+        </button>
+        <div className={styles.fields}>
+          <p className={styles.from} data-testid="route-from">
+            {label(from)}
+          </p>
+          <p className={styles.to} data-testid="route-to">
+            {label(to)}
+          </p>
+        </div>
+        <button type="button" className={styles.close} aria-label="닫기" onClick={close}>
+          <img src={icons.closeLarge} alt="" aria-hidden />
+        </button>
       </div>
+
+      {/* 하단 꽉 찬 코랄 바 (Figma 10:16615) */}
+      <button type="button" className={styles.confirm} onClick={handleConfirm} disabled={!from || !to}>
+        경로 설정하기
+      </button>
 
       <LocationPermissionDialog open={locationError} onClose={() => setLocationError(false)} onOpenSettings={load} />
     </div>
