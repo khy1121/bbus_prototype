@@ -2,7 +2,6 @@
   position: relative;
   flex-shrink: 0;
   width: 152px;
-  height: 164px;
   border-radius: 10px;
   overflow: hidden;
   background: var(--color-white);
@@ -11,30 +10,31 @@
 
 .main {
   @include focus-ring;
-  display: block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  height: 100%;
   text-align: left;
 }
 
+// Figma 10:7105 — 152×96 사진을 위로 10px 올리고, 정보 박스가 아래 11px 를 덮는다 (보이는 사진 높이 75px).
+// 비율로 잡아서 카드가 넓어져도(데스크톱 그리드) 사진이 납작하게 잘리지 않는다.
 .thumbnail {
   width: 100%;
-  height: 86px;
+  aspect-ratio: 152 / 96;
+  margin-top: -10px;
   object-fit: cover;
   background: var(--color-gray-100);
 }
 
 .info {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 75px;
+  position: relative;
+  margin-top: -11px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   height: 89px;
   padding: 7px 9px 9px;
-  border-radius: 10px;
+  border-radius: 0 0 10px 10px;
   background: var(--color-white);
 }
 
