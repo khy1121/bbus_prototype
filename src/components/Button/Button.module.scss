@@ -1,0 +1,116 @@
+.button {
+  @include focus-ring;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border: 0;
+  transition:
+    background-color $duration-fast ease,
+    transform $duration-fast ease;
+  @include typo('body-m-medium');
+  white-space: nowrap;
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+// ---------- variants ----------
+// primary: 코랄 (pressed → 코랄pressed)
+.primary {
+  background: var(--color-coral);
+  color: var(--color-white);
+
+  &:active:not(:disabled),
+  &[aria-pressed='true'] {
+    background: var(--color-coral-pressed);
+  }
+
+  &:disabled {
+    background: var(--color-gray-200);
+    color: var(--color-white);
+  }
+}
+
+// secondary: 코랄2 배경 + 코랄pressed 텍스트 (취소, 연인에게 보내기)
+.secondary {
+  background: var(--color-coral-2);
+  color: var(--color-coral-pressed);
+
+  &:active:not(:disabled) {
+    background: var(--color-coral-pressed2);
+  }
+
+  &:disabled {
+    background: var(--color-gray-100);
+    color: var(--color-gray-400);
+  }
+}
+
+// tonal: 코랄3 배경 (랜덤 사연 START!, 게임 종료하기)
+.tonal {
+  background: var(--color-coral-3);
+  color: var(--color-coral);
+
+  &:active:not(:disabled) {
+    background: var(--color-coral-2);
+  }
+
+  &:disabled {
+    background: var(--color-gray-100);
+    color: var(--color-gray-400);
+  }
+}
+
+// ---------- sizes ----------
+.lg {
+  height: 48px;
+  border-radius: $radius-full;
+}
+
+.md {
+  height: 50px;
+  border-radius: $radius-xl;
+}
+
+.dialog {
+  height: 45px;
+  border-radius: 15px;
+}
+
+.pill {
+  height: 44px;
+  border-radius: $radius-full;
+  box-shadow: 0 4px 5px rgba(0, 0, 0, 0.4);
+
+  &.primary {
+    border: 0.5px solid var(--color-coral-pressed);
+  }
+}
+
+.sm {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: $radius-full;
+  @include typo('body-s');
+}
