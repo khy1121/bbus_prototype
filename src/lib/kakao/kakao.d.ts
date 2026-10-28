@@ -53,6 +53,7 @@ declare namespace kakao.maps {
     setMap(map: Map | null): void
     setPosition(latlng: LatLng): void
     setZIndex(zIndex: number): void
+    setContent(content: HTMLElement | string): void
   }
 
   class Polyline {

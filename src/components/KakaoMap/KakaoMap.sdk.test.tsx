@@ -12,6 +12,7 @@ const calls = vi.hoisted(() => ({
   overlayCreated: 0,
   overlayMoved: 0,
   overlayRemoved: 0,
+  contentSet: 0,
   listeners: {} as Record<string, () => void>,
 }))
 
@@ -49,6 +50,9 @@ const fakeKakao = vi.hoisted(() => {
       calls.overlayMoved += 1
     }
     setZIndex() {}
+    setContent() {
+      calls.contentSet += 1
+    }
   }
   class Polyline {
     opts: { path: unknown[] }
@@ -95,6 +99,7 @@ describe('KakaoMap (SDK 연동)', () => {
     calls.overlayCreated = 0
     calls.overlayMoved = 0
     calls.overlayRemoved = 0
+    calls.contentSet = 0
     calls.listeners = {}
   })
 
@@ -173,5 +178,20 @@ describe('KakaoMap (SDK 연동)', () => {
     const before = calls.polylineCreated
     rerender(<KakaoMap label="지도" center={path[0]} path={[path[0], { lat: 37.7, lng: 127.2 }]} />)
     expect(calls.polylineCreated).toBeGreaterThan(before)
+  })
+
+  it('contentKey 가 바뀌면 오버레이는 그대로 두고 내용(이미지)만 바꾼다 — 차량 방향 전환', async () => {
+    const render1 = vi.fn(() => document.createElement('img'))
+    const marker = (contentKey: string): MapMarker => ({ id: 'car', position: path[0], contentKey, render: render1 })
+    const { rerender } = render(<KakaoMap label="지도" center={path[0]} markers={[marker('E')]} />)
+    await waitFor(() => expect(calls.overlayCreated).toBe(1))
+
+    rerender(<KakaoMap label="지도" center={path[0]} markers={[marker('E')]} />)
+    expect(calls.contentSet).toBe(0) // 같은 방향이면 그대로
+
+    rerender(<KakaoMap label="지도" center={path[0]} markers={[marker('N')]} />)
+    expect(calls.contentSet).toBe(1)
+    expect(calls.overlayCreated).toBe(1)
+    expect(render1).toHaveBeenCalledTimes(2)
   })
 })

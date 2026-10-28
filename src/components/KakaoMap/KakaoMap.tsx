@@ -12,6 +12,8 @@ export type MapMarker = {
   /** 마커로 쓸 DOM (커스텀 오버레이). 없으면 기본 코랄 점 */
   render?: () => HTMLElement
   onClick?: () => void
+  /** 바뀌면 오버레이는 유지한 채 render() 로 내용만 다시 그린다 (예: 차량 진행 방향 이미지) */
+  contentKey?: string
   /** 마커 DOM 이 스스로 클릭을 처리할 때(예: <button>) true — 지도가 클릭을 가로채지 않게 한다 */
   clickable?: boolean
   zIndex?: number
@@ -155,6 +157,14 @@ export function KakaoMap({
     if (status !== 'ready' || !map || !k) return
     const current = overlaysRef.current
     const nextIds = new Set(markers.map((m) => m.id))
+    const createContent = (m: MapMarker) => {
+      const content = m.render ? m.render() : defaultMarker()
+      if (m.onClick) {
+        content.style.cursor = 'pointer'
+        content.addEventListener('click', () => current.get(m.id)?.marker.onClick?.())
+      }
+      return content
+    }
 
     // 사라진 마커 제거
     for (const [id, entry] of current) {
@@ -172,17 +182,13 @@ export function KakaoMap({
           entry.overlay.setPosition(new k.maps.LatLng(m.position.lat, m.position.lng))
         }
         if (prev.zIndex !== m.zIndex && m.zIndex !== undefined) entry.overlay.setZIndex(m.zIndex)
+        if (prev.contentKey !== m.contentKey) entry.overlay.setContent(createContent(m))
         entry.marker = m // 클릭 핸들러는 항상 최신 마커 기준
         continue
       }
-      const content = m.render ? m.render() : defaultMarker()
-      if (m.onClick) {
-        content.style.cursor = 'pointer'
-        content.addEventListener('click', () => current.get(m.id)?.marker.onClick?.())
-      }
       const overlay = new k.maps.CustomOverlay({
         position: new k.maps.LatLng(m.position.lat, m.position.lng),
-        content,
+        content: createContent(m),
         yAnchor: 1,
         zIndex: m.zIndex,
         clickable: m.clickable ?? Boolean(m.onClick),
