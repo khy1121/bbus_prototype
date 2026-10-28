@@ -8,7 +8,6 @@ import { fetchDriveConditions, fetchPlacesByCategory } from '../api'
 import { CurationSection } from '../components/CurationSection'
 import { DriveBanner } from '../components/DriveBanner'
 import { HomeHeader } from '../components/HomeHeader'
-import { RecommendBanner } from '../components/RecommendBanner'
 import { useHomeStore } from '../homeStore'
 import { useLocationPermission } from '../hooks/useLocationPermission'
 import type { CategoryId, DriveConditions } from '../types'
@@ -81,10 +80,6 @@ export function HomePage() {
         />
         <div className={styles.banners}>
           <DriveBanner conditions={shownConditions} onStart={() => openDriveStart()} className={styles.driveBanner} />
-          <RecommendBanner
-            className={styles.recommendDesktop}
-            onClick={() => handleCategoryChange('sea')} // TODO: 추천 코스 상세 (디자인 미정)
-          />
         </div>
       </div>
 
@@ -101,10 +96,6 @@ export function HomePage() {
           onRefresh={() => setPage((p) => p + 1)}
           loading={loading}
         />
-      </div>
-
-      <div className={styles.recommendMobile}>
-        <RecommendBanner onClick={() => handleCategoryChange('sea')} />
       </div>
 
       <LocationPermissionDialog

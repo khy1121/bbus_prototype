@@ -32,6 +32,12 @@ describe('HomePage', () => {
     expect(screen.getByText('시흥 오이도')).toBeInTheDocument()
   })
 
+  it('추천 코스 배너(연인과 떠나는 노을 드라이브)는 노출하지 않는다', async () => {
+    renderPage()
+    await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(7))
+    expect(screen.queryByText('연인과 떠나는 노을 드라이브')).not.toBeInTheDocument()
+  })
+
   it('읽지 않은 알림이 있으면 빨간 점, 알림 버튼 → 알림 목록', async () => {
     const { user, router } = renderPage()
     expect(await screen.findByTestId('unread-dot')).toBeInTheDocument()

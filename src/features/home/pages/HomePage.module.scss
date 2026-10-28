@@ -19,10 +19,6 @@
   margin: 0 -4px; // 배너는 좌우 21px (Figma)
 }
 
-.recommendDesktop {
-  display: none;
-}
-
 // Figma 10:6363 — 10px 디바이더
 .divider {
   height: 10px;
@@ -31,10 +27,6 @@
 
 .curation {
   padding-top: 17px;
-}
-
-.recommendMobile {
-  padding: 20px 21px 0;
 }
 
 // ---------- 태블릿: 모바일 레이아웃을 넓힌 형태 ----------
@@ -58,18 +50,10 @@
   }
 
   .banners {
-    display: grid;
-    grid-template-columns: 3fr 2fr;
     margin: 0;
   }
 
   .driveBanner {
-    min-height: 240px;
-  }
-
-  .recommendDesktop {
-    display: flex;
-    height: 100%;
     min-height: 240px;
   }
 
@@ -79,9 +63,5 @@
 
   .curation {
     padding-top: 32px;
-  }
-
-  .recommendMobile {
-    display: none;
   }
 }
