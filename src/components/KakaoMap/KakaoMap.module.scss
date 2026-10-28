@@ -9,6 +9,13 @@
 .map {
   position: absolute;
   inset: 0;
+
+  // 전역 리셋(img, svg { max-width: 100% })이 지도 내부 요소를 찌그러뜨리지 않게 해제.
+  // 카카오는 경로를 0px 너비 부모 안의 큰 SVG 로 그리므로, 리셋이 적용되면 경로가 보이지 않는다.
+  :global(img),
+  :global(svg) {
+    max-width: none;
+  }
 }
 
 // 키 없을 때 — 지도 느낌의 패턴 배경
