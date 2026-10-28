@@ -18,7 +18,7 @@ const MAX_RADIUS_M = 20000
 /** 카카오 동시 요청 수 */
 const CONCURRENCY = 6
 
-export type RestStopPlace = { id: string; name: string; highway: string; position: LatLng }
+export type RestStopPlace = { id: string; name: string; highway: string; category?: string; position: LatLng }
 
 type KakaoPlace = {
   id: string
@@ -129,6 +129,7 @@ export async function handleRestStopsRequest(
         id: place.id,
         name: place.place_name,
         highway: highwayOf(place),
+        category: place.category_name,
         position: { lat: Number(place.y), lng: Number(place.x) },
       })
     }

@@ -71,8 +71,8 @@ describe('카카오 로컬 휴게소 검색', () => {
     expect(fetchMock.mock.calls[0][1]).toMatchObject({ headers: { Authorization: 'KakaoAK key' } })
     expect(body).toEqual({
       places: [
-        { id: '1', name: '기흥휴게소 부산방향', highway: '경부고속도로', position: { lat: 37.1, lng: 127.1 } },
-        { id: '2', name: '안성휴게소 부산방향', highway: '경부고속도로', position: { lat: 37.0, lng: 127.2 } },
+        { id: '1', name: '기흥휴게소 부산방향', highway: '경부고속도로', category: '교통,수송 > 휴게소 > 고속도로휴게소', position: { lat: 37.1, lng: 127.1 } },
+        { id: '2', name: '안성휴게소 부산방향', highway: '경부고속도로', category: '교통,수송 > 휴게소 > 고속도로휴게소', position: { lat: 37.0, lng: 127.2 } },
       ],
     })
   })
