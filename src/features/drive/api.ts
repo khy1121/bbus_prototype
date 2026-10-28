@@ -1,6 +1,7 @@
 import type { PlaceSummary } from '@/components'
 import type { LatLng } from '@/components/KakaoMap/KakaoMap'
 import { cumulativeKm, haversineKm, pointAtKm } from '@/lib/geo'
+import type { RestStopPlace } from '@/lib/kakao/restStops'
 import { locate, reverseGeocodeRegion } from '@/lib/location'
 import {
   BALANCE_QUESTIONS,
@@ -24,6 +25,7 @@ import type {
   RadioStory,
   RestStop,
 } from './types'
+import { restStopsOnRoute, samplePointsAlongPath } from './utils/routeRestStops'
 
 /*
  * 드라이브 모드 API 레이어.
@@ -75,8 +77,10 @@ export async function getPopularRoutes(): Promise<PlaceSummary[]> {
   return MOCK_POPULAR_ROUTES
 }
 
-/** 경로 위 휴게소 배치 지점 (전체 거리 대비 비율) */
-const REST_STOP_FRACTIONS = [0.3, 0.55, 0.8]
+/** 길찾기를 못 쓸 때(근사 경로) 목업 휴게소를 놓을 지점 (전체 거리 대비 비율) */
+const MOCK_REST_STOP_FRACTIONS = [0.3, 0.55, 0.8]
+/** 휴게소 검색 지점 간격(km) — 반경은 간격보다 넉넉하게 잡아 경로 전체를 덮는다 */
+const REST_STOP_SEARCH_STEP_KM = 10
 
 /** 카카오모빌리티 길찾기 결과 (서버 프록시 /api/directions 응답) */
 type DirectionsResponse = { path: LatLng[]; distanceKm: number; durationMin: number }
@@ -104,9 +108,24 @@ function mockDirections(from: LatLng, to: LatLng): DirectionsResponse {
   return { path, distanceKm, durationMin: Math.round((distanceKm / 45) * 60) }
 }
 
+/** 경로를 따라 카카오 로컬에서 '휴게소'를 검색 (서버 프록시 /api/rest-stops) */
+async function fetchRestStopPlaces(path: LatLng[]): Promise<RestStopPlace[]> {
+  const points = samplePointsAlongPath(path, REST_STOP_SEARCH_STEP_KM)
+  const step = haversineKm(points[0], points[1] ?? points[0])
+  const radiusM = Math.round(Math.min(Math.max(step * 0.75, 3), 20) * 1000)
+  const params = new URLSearchParams({
+    points: points.map((p) => `${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join('|'),
+    radius: String(radiusM),
+  })
+  const res = await fetch(`/api/rest-stops?${params}`)
+  if (!res.ok) throw new Error(`휴게소 검색 실패 (${res.status})`)
+  const data = (await res.json()) as { places?: RestStopPlace[] }
+  return data.places ?? []
+}
+
 /**
- * 출발지(현재 위치) → 목적지 경로. 카카오모빌리티 길찾기로 실제 도로를 따라가는 좌표를 받는다.
- * TODO(backend): 경로 내 실제 휴게소 조회 (현재는 목업 휴게소를 경로 위 일정 비율 지점에 배치)
+ * 출발지(현재 위치) → 목적지 경로. 카카오모빌리티 길찾기로 실제 도로를 따라가는 좌표를 받고,
+ * 경로 주변 휴게소를 검색해 실제로 경로 위(진행 방향)에 있는 휴게소만 고른다.
  */
 export async function getRoute(origin: LatLng, destination: { position: LatLng }): Promise<DriveRoute> {
   const from = origin
@@ -117,13 +136,21 @@ export async function getRoute(origin: LatLng, destination: { position: LatLng }
   } catch (e) {
     console.warn('[drive] 길찾기 API 를 사용할 수 없어 근사 경로로 대체합니다.', e)
     directions = mockDirections(from, to)
+    const acc = cumulativeKm(directions.path)
+    const pathKm = acc[acc.length - 1]
+    const restStops = MOCK_REST_STOPS.slice(0, MOCK_REST_STOP_FRACTIONS.length).map((r, i) => ({
+      ...r,
+      position: pointAtKm(directions.path, pathKm * MOCK_REST_STOP_FRACTIONS[i], acc),
+    }))
+    return { ...directions, restStops }
   }
-  const acc = cumulativeKm(directions.path)
-  const pathKm = acc[acc.length - 1]
-  const restStops = MOCK_REST_STOPS.slice(0, REST_STOP_FRACTIONS.length).map((r, i) => ({
-    ...r,
-    position: pointAtKm(directions.path, pathKm * REST_STOP_FRACTIONS[i], acc),
-  }))
+  let restStops: RestStop[] = []
+  try {
+    restStops = restStopsOnRoute(directions.path, await fetchRestStopPlaces(directions.path))
+  } catch (e) {
+    // 실제 경로 위에 가짜 휴게소를 띄우지 않는다
+    console.warn('[drive] 휴게소 검색을 사용할 수 없어 휴게소 없이 안내합니다.', e)
+  }
   return { ...directions, restStops }
 }
 
