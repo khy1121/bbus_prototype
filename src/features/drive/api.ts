@@ -1,4 +1,6 @@
 import type { PlaceSummary } from '@/components'
+import { fetchPlaceDetail, fetchPlacesByCategory } from '@/features/home/api'
+import type { CategoryId } from '@/features/home/types'
 import type { LatLng } from '@/components/KakaoMap/KakaoMap'
 import { cumulativeKm, haversineKm, pointAtKm } from '@/lib/geo'
 import type { RestStopPlace } from '@/lib/kakao/restStops'
@@ -69,12 +71,23 @@ export async function searchPlaces(query: string): Promise<Place[]> {
 }
 
 export async function getPlace(id: string): Promise<Place | undefined> {
-  return MOCK_PLACES.find((p) => p.id === id)
+  const place = MOCK_PLACES.find((p) => p.id === id)
+  if (place) return place
+  // 테마 추천 장소(홈 큐레이션과 같은 데이터)
+  const detail = await fetchPlaceDetail(id)
+  return detail
+    ? { id: detail.id, name: detail.name, address: detail.address, distanceKm: 0, position: detail.position }
+    : undefined
 }
 
 // TODO(backend): 인기 드라이브 경로 API
 export async function getPopularRoutes(): Promise<PlaceSummary[]> {
   return MOCK_POPULAR_ROUTES
+}
+
+/** 테마(바다·야경·…)별 추천 장소 — 홈 '스마트 탐색 & 큐레이션'과 같은 목록 */
+export async function getRecommendedPlaces(category: CategoryId): Promise<PlaceSummary[]> {
+  return fetchPlacesByCategory(category)
 }
 
 /** 길찾기를 못 쓸 때(근사 경로) 목업 휴게소를 놓을 지점 (전체 거리 대비 비율) */
