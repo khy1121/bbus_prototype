@@ -58,7 +58,7 @@ describe('DrivePage (01 / 04 / 16)', () => {
     await user.click(screen.getByRole('button', { name: '주행 중단' }))
     expect(useDriveStore.getState().status).toBe('paused')
     expect(screen.getByText('기록이 중단되었어요.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /화면을 탭하면 주행을 다시 시작해요/ }))
+    await user.click(screen.getByRole('button', { name: /화면을 한 번 터치해 주행을 재개해 주세요/ }))
     expect(useDriveStore.getState().status).toBe('driving')
   })
 

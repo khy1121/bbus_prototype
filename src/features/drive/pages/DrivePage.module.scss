@@ -23,9 +23,6 @@
   }
 }
 
-.blurred {
-  filter: blur(4px);
-}
 
 .topBar {
   position: absolute;
@@ -100,7 +97,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 24px;
   min-width: 0;
 
   // Figma 는 한 줄(nowrap). 좁은 화면에서는 줄바꿈 대신 말줄임
@@ -147,22 +144,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
   padding-bottom: var(--sheet-h);
-  background: rgba(255, 251, 251, 0.35);
+  // Figma 10:9432: 지도 위 요소까지 함께 흐리게
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   cursor: pointer;
 }
 
 .pausedTitle {
-  @include typo('title-s-bold');
+  @include typo('title-m-bold');
   color: var(--color-white);
-  text-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .pausedDesc {
-  @include typo('body-m-medium');
+  @include typo('body-l');
   color: var(--color-white);
-  text-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 // 데스크톱: 하단 시트를 대체하는 우측 패널

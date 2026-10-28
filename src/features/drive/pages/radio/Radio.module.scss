@@ -79,13 +79,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px 0 30px;
+  padding: 0 20px 0 25px;
   height: 60px;
 }
 
 .drawerTitle {
   @include typo('title-s-bold');
-  color: var(--color-black);
+  // Figma 10:17010: 22px / 30px
+  font-size: 22px;
+  line-height: 30px;
+  color: var(--color-gray-900);
 }
 
 .drawerSearch {
@@ -93,7 +96,7 @@
   align-items: center;
   gap: 16px;
   height: 60px;
-  margin: 16px 20px 20px;
+  margin: 12px 20px 20px;
   padding: 0 20px 0 24px;
   border-radius: 15px;
   background: var(--color-gray-100);

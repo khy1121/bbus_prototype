@@ -181,7 +181,6 @@ export function DrivePage() {
           // 지나온 길은 숨기고 남은 경로만 그린다
           pathProgressKm={traveledKm}
           fitBounds={hasRoute}
-          className={paused ? styles.blurred : undefined}
         />
 
         <div className={styles.topBar}>
@@ -219,10 +218,10 @@ export function DrivePage() {
             type="button"
             className={styles.paused}
             onClick={resume}
-            aria-label="기록이 중단되었어요. 화면을 탭하면 주행을 다시 시작해요."
+            aria-label="기록이 중단되었어요. 화면을 한 번 터치해 주행을 재개해 주세요."
           >
             <span className={styles.pausedTitle}>기록이 중단되었어요.</span>
-            <span className={styles.pausedDesc}>화면을 탭하면 주행을 다시 시작해요.</span>
+            <span className={styles.pausedDesc}>화면을 한 번 터치해 주행을 재개해 주세요.</span>
           </button>
         )}
       </div>
@@ -251,7 +250,7 @@ export function DrivePage() {
       <ConfirmDialog
         open={exitOpen}
         title="드라이브를 마치시겠어요?"
-        description={'조금 더 달리고 싶다면\n경로를 수정해 보세요.'}
+        description="조금 더 달리고 싶다면 경로를 수정해 보세요."
         cancelLabel="경로 수정"
         confirmLabel="드라이브 종료"
         onCancel={() => {
