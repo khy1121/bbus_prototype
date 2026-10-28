@@ -1,3 +1,4 @@
+import { cumulativeKm } from '@/lib/geo'
 import type { DriveRoute, RestStop } from '../types'
 
 /**
@@ -11,9 +12,10 @@ export type RestStopAlert = { stop: RestStop; remainingKm: number }
 
 const sq = (n: number) => n * n
 
-/** 각 휴게소가 경로 시작점에서 몇 km 지점인지 (경로 위 가장 가까운 점 기준) */
+/** 각 휴게소가 경로 시작점에서 몇 km 지점인지 — 경로 위 가장 가까운 점까지의 실제 누적 거리 기준 */
 export function restStopOffsetsKm(route: DriveRoute): { stop: RestStop; offsetKm: number }[] {
-  const last = route.path.length - 1
+  const acc = cumulativeKm(route.path)
+  const pathKm = acc[acc.length - 1] || 1
   return route.restStops.map((stop) => {
     let nearest = 0
     let best = Infinity
@@ -24,7 +26,8 @@ export function restStopOffsetsKm(route: DriveRoute): { stop: RestStop; offsetKm
         nearest = i
       }
     })
-    const offsetKm = last > 0 ? (nearest / last) * route.distanceKm : 0
+    // 경로 좌표 길이와 길찾기 요약 거리의 차이를 보정해 route.distanceKm 기준으로 환산
+    const offsetKm = (acc[nearest] / pathKm) * route.distanceKm
     return { stop, offsetKm: Math.round(offsetKm * 1000) / 1000 }
   })
 }

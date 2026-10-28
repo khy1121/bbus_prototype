@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   generatePlaylist,
   getBalanceQuestions,
@@ -19,6 +20,43 @@ describe('drive api (mock)', () => {
 
   it('검색 결과가 없으면 빈 배열', async () => {
     expect(await searchPlaces('없는장소zzz')).toEqual([])
+  })
+
+  describe('getRoute (카카오모빌리티 길찾기)', () => {
+    afterEach(() => vi.unstubAllGlobals())
+
+    it('/api/directions 의 실제 도로 경로를 쓰고, 휴게소를 경로 위에 배치한다', async () => {
+      const roadPath = [
+        { lat: 37.48, lng: 127.03 },
+        { lat: 37.45, lng: 126.95 },
+        { lat: 37.4, lng: 126.85 },
+        { lat: 37.35, lng: 126.7 },
+      ]
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ path: roadPath, distanceKm: 42.3, durationMin: 51 }),
+      })
+      vi.stubGlobal('fetch', fetchMock)
+
+      const route = await getRoute({ position: { lat: 37.34, lng: 126.68 } })
+      const url = new URL(fetchMock.mock.calls[0][0], 'http://x')
+      expect(url.pathname).toBe('/api/directions')
+      expect(url.searchParams.get('destination')).toBe('37.34,126.68')
+      expect(route.path).toEqual(roadPath)
+      expect(route).toMatchObject({ distanceKm: 42.3, durationMin: 51 })
+      // 휴게소 좌표는 경로 범위 안
+      route.restStops.forEach((s) => {
+        expect(s.position.lat).toBeLessThanOrEqual(37.48)
+        expect(s.position.lat).toBeGreaterThanOrEqual(37.35)
+      })
+    })
+
+    it('길찾기 API 를 쓸 수 없으면(키 없음·네트워크 오류) 목업 경로로 대체한다', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({}) }))
+      const route = await getRoute({ position: { lat: 37.34, lng: 126.68 } })
+      expect(route.path.length).toBeGreaterThan(1)
+      expect(route.distanceKm).toBeGreaterThan(0)
+    })
   })
 
   it('getRoute 는 경로와 경로 위 휴게소를 돌려준다', async () => {

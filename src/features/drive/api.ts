@@ -1,5 +1,6 @@
 import type { PlaceSummary } from '@/components'
 import type { LatLng } from '@/components/KakaoMap/KakaoMap'
+import { cumulativeKm, haversineKm, pointAtKm } from '@/lib/geo'
 import {
   BALANCE_QUESTIONS,
   djScript,
@@ -51,19 +52,56 @@ export async function getPopularRoutes(): Promise<PlaceSummary[]> {
   return MOCK_POPULAR_ROUTES
 }
 
-// TODO(backend): 카카오 모빌리티 길찾기 API + 경로 내 휴게소 조회
-export async function getRoute(destination: { position: LatLng }): Promise<DriveRoute> {
-  const from = MY_POSITION
-  const to = destination.position
+/** 경로 위 휴게소 배치 지점 (전체 거리 대비 비율) */
+const REST_STOP_FRACTIONS = [0.3, 0.55, 0.8]
+
+/** 카카오모빌리티 길찾기 결과 (서버 프록시 /api/directions 응답) */
+type DirectionsResponse = { path: LatLng[]; distanceKm: number; durationMin: number }
+
+async function fetchDirections(from: LatLng, to: LatLng): Promise<DirectionsResponse> {
+  const params = new URLSearchParams({ origin: `${from.lat},${from.lng}`, destination: `${to.lat},${to.lng}` })
+  const res = await fetch(`/api/directions?${params}`)
+  if (!res.ok) throw new Error(`길찾기 실패 (${res.status})`)
+  const data = (await res.json()) as DirectionsResponse
+  if (!Array.isArray(data.path) || data.path.length < 2) throw new Error('경로가 비어 있어요.')
+  return data
+}
+
+/** 길찾기를 쓸 수 없을 때(키 미설정·오류) 보여줄 근사 경로 */
+function mockDirections(from: LatLng, to: LatLng): DirectionsResponse {
   const steps = 8
   const path = Array.from({ length: steps + 1 }, (_, i) => {
     const t = i / steps
-    // 약간 휘어진 경로
-    return { lat: from.lat + (to.lat - from.lat) * t + Math.sin(t * Math.PI) * 0.02, lng: from.lng + (to.lng - from.lng) * t }
+    return {
+      lat: from.lat + (to.lat - from.lat) * t + Math.sin(t * Math.PI) * 0.02,
+      lng: from.lng + (to.lng - from.lng) * t,
+    }
   })
-  const distanceKm = Math.max(haversine(from, to) * 1.3, 1)
-  const restStops = MOCK_REST_STOPS.slice(0, 3).map((r, i) => ({ ...r, position: path[2 + i * 2] }))
-  return { path, restStops, distanceKm, durationMin: Math.round((distanceKm / 45) * 60) }
+  const distanceKm = Math.max(haversineKm(from, to) * 1.3, 1)
+  return { path, distanceKm, durationMin: Math.round((distanceKm / 45) * 60) }
+}
+
+/**
+ * 출발지(현재 위치) → 목적지 경로. 카카오모빌리티 길찾기로 실제 도로를 따라가는 좌표를 받는다.
+ * TODO(backend): 경로 내 실제 휴게소 조회 (현재는 목업 휴게소를 경로 위 일정 비율 지점에 배치)
+ */
+export async function getRoute(destination: { position: LatLng }): Promise<DriveRoute> {
+  const from = MY_POSITION
+  const to = destination.position
+  let directions: DirectionsResponse
+  try {
+    directions = await fetchDirections(from, to)
+  } catch (e) {
+    console.warn('[drive] 길찾기 API 를 사용할 수 없어 근사 경로로 대체합니다.', e)
+    directions = mockDirections(from, to)
+  }
+  const acc = cumulativeKm(directions.path)
+  const pathKm = acc[acc.length - 1]
+  const restStops = MOCK_REST_STOPS.slice(0, REST_STOP_FRACTIONS.length).map((r, i) => ({
+    ...r,
+    position: pointAtKm(directions.path, pathKm * REST_STOP_FRACTIONS[i], acc),
+  }))
+  return { ...directions, restStops }
 }
 
 // TODO(backend): 휴게소/대표메뉴 데이터 (한국도로공사 공공데이터 등)
@@ -109,14 +147,4 @@ export async function getQuizQuestions(): Promise<QuizQuestion[]> {
 }
 export async function getMemoryQuestions(): Promise<MemoryQuestion[]> {
   return MEMORY_QUESTIONS
-}
-
-function haversine(a: LatLng, b: LatLng): number {
-  const R = 6371
-  const dLat = ((b.lat - a.lat) * Math.PI) / 180
-  const dLng = ((b.lng - a.lng) * Math.PI) / 180
-  const x =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
-  return 2 * R * Math.asin(Math.sqrt(x))
 }

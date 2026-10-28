@@ -4,6 +4,7 @@ import { ConfirmDialog, DraggableSheet, SegmentedControl, type SnapPoint } from 
 import { KakaoMap } from '@/components/KakaoMap/KakaoMap'
 import { DriveStartSheet } from '@/features/drive-start/DriveStartSheet'
 import { useIsDesktop } from '@/hooks/useMediaQuery'
+import { cumulativeKm, pointAtKm } from '@/lib/geo'
 import { useDriveStore } from '@/stores/driveStore'
 import { getRestStops, getCurrentLocation } from '../api'
 import { icons, images } from '../assets'
@@ -73,7 +74,10 @@ export function DrivePage() {
 
   const hasRoute = Boolean(destination && route)
   const progress = route ? routeProgress(route, elapsedSec) : 0
-  const carPosition = route ? route.path[Math.min(Math.floor(progress * (route.path.length - 1)), route.path.length - 1)] : myPosition
+  const pathKm = useMemo(() => (route ? cumulativeKm(route.path) : null), [route])
+  // 경로를 따라 실제 거리 비율만큼 이동한 지점 (길찾기 좌표는 점 간격이 고르지 않음)
+  const carPosition =
+    route && pathKm ? pointAtKm(route.path, pathKm[pathKm.length - 1] * progress, pathKm) : myPosition
   const stats = hasRoute
     ? {
         elapsedSec,
