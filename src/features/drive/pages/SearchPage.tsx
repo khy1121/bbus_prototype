@@ -3,7 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { EmptyState, PlaceCard, type PlaceSummary } from '@/components'
 import { LocationPermissionDialog } from '@/features/permissions/LocationPermissionDialog'
 import { useDriveStore, type Destination } from '@/stores/driveStore'
-import { getCurrentLocation, getPopularRoutes, searchPlaces } from '../api'
+import { CategoryChips } from '@/features/home/components/CategoryChips'
+import { CATEGORIES } from '@/features/home/mocks'
+import type { CategoryId } from '@/features/home/types'
+import { getCurrentLocation, getPopularRoutes, getRecommendedPlaces, searchPlaces } from '../api'
 import { icons, images } from '../assets'
 import { useDriveDataStore } from '../stores/driveDataStore'
 import type { Place } from '../types'
@@ -40,6 +43,9 @@ export function SearchPage() {
   const [input, setInput] = useState(query || destination?.name || '')
   const [results, setResults] = useState<Place[] | null>(null)
   const [popular, setPopular] = useState<PlaceSummary[]>([])
+  /** 테마 칩 — 고르면 추천 장소를 그 테마로 거른다, 다시 누르면 해제 */
+  const [theme, setTheme] = useState<CategoryId | null>(null)
+  const [recommended, setRecommended] = useState<PlaceSummary[]>([])
 
   const loadLocation = () =>
     getCurrentLocation({ fresh: true })
@@ -95,6 +101,18 @@ export function SearchPage() {
   }
 
   /** 장소 선택 → 입력 중인 칸에 넣는다 */
+  useEffect(() => {
+    if (!theme) return
+    let alive = true
+    getRecommendedPlaces(theme).then((places) => alive && setRecommended(places))
+    return () => {
+      alive = false
+    }
+  }, [theme])
+
+  const themeLabel = CATEGORIES.find((c) => c.id === theme)?.label
+  const shownPlaces = theme ? recommended : popular
+
   const choose = (place: Place | PlaceSummary, field: Field = active) => {
     const picked: Endpoint = { kind: 'place', place: asPlace(place) }
     const nextFrom = field === 'from' ? picked : from
@@ -201,6 +219,17 @@ export function SearchPage() {
 
       {results === null ? (
         <>
+          {/* 테마 칩 (Figma 10:16282) — 추천 장소 필터 */}
+          <CategoryChips
+            className={styles.themes}
+            label="추천 테마"
+            selected={theme}
+            onSelect={(c) => {
+              setRecommended([])
+              setTheme((current) => (current === c ? null : c))
+            }}
+          />
+
           <ul className={styles.recent} aria-label="최근 검색어">
             {recentSearches.map((r) => (
               <li key={r.id} className={styles.recentItem}>
@@ -223,10 +252,10 @@ export function SearchPage() {
 
           <section className={styles.popular} aria-labelledby="popular-title">
             <h2 id="popular-title" className={styles.popularTitle}>
-              인기 드라이브 경로 BEST
+              {themeLabel ? `${themeLabel} 추천 드라이브` : '인기 드라이브 경로 BEST'}
             </h2>
             <div className={styles.popularList}>
-              {popular.map((place) => (
+              {shownPlaces.map((place) => (
                 <PlaceCard key={place.id} place={place} onClick={() => choose(place, 'to')} />
               ))}
             </div>

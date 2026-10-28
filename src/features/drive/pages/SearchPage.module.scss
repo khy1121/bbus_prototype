@@ -143,6 +143,24 @@
 }
 
 // 최근 검색어
+// 테마 칩 (Figma 10:16282: 36px 칩, 간격 12, 위·아래 20) — 가로 스크롤, 그림자 여유 5px
+.themes {
+  display: flex;
+  gap: 12px;
+  margin: 15px -23px 0 -25px;
+  padding: 5px 23px 5px 25px;
+  overflow-x: auto;
+  @include hide-scrollbar;
+
+  > * {
+    flex-shrink: 0;
+  }
+}
+
+.themes + .recent {
+  margin-top: 15px;
+}
+
 .recent {
   display: flex;
   flex-direction: column;

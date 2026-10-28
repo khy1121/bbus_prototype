@@ -19,6 +19,28 @@ describe('SearchPage (02 / 03)', () => {
     expect(screen.getByRole('heading', { name: '인기 드라이브 경로 BEST' })).toBeInTheDocument()
   })
 
+  it('테마 칩으로 추천 장소를 거른다 — 다시 누르면 인기 경로로 (Figma 10:16282)', async () => {
+    const { user } = renderDrive('/drive/search')
+    const chips = screen.getByRole('group', { name: '추천 테마' })
+    await user.click(within(chips).getByRole('button', { name: '차박' }))
+    const section = (await screen.findByRole('region', { name: '차박 추천 드라이브' }))
+    expect(within(chips).getByRole('button', { name: '차박' })).toHaveAttribute('aria-pressed', 'true')
+    expect(await within(section).findByText('태안 몽산포 캠핑장')).toBeInTheDocument()
+    expect(within(section).queryByText('시흥 오이도')).not.toBeInTheDocument()
+
+    await user.click(within(chips).getByRole('button', { name: '차박' }))
+    expect(await screen.findByRole('heading', { name: '인기 드라이브 경로 BEST' })).toBeInTheDocument()
+  })
+
+  it('추천 장소를 고르면 그 장소로 경로 미리보기', async () => {
+    const { user, router } = renderDrive('/drive/search')
+    await user.click(within(screen.getByRole('group', { name: '추천 테마' })).getByRole('button', { name: '바다' }))
+    const section = await screen.findByRole('region', { name: '바다 추천 드라이브' })
+    await user.click((await within(section).findAllByText('강릉 헌화로'))[0])
+    expect(router.state.location.pathname).toBe('/drive/route/heonhwa')
+    expect(await screen.findByTestId('route-to')).toHaveTextContent('강릉 헌화로')
+  })
+
   it('최근 검색어 삭제', async () => {
     const { user } = renderDrive('/drive/search')
     await user.click(screen.getByRole('button', { name: '서울 반포 한강공원 삭제' }))
