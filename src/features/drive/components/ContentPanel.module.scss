@@ -1,0 +1,137 @@
+@use '../styles/drive' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  @include typo('body-s');
+  @include gradient-text-2;
+
+  img {
+    width: 14px;
+    height: 15px;
+  }
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+// DJ 플레이리스트 카드 (Figma 10:14227)
+.djCard {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 96px;
+  padding: 14px 16px 14px 17px;
+  border: 1px solid var(--color-coral-2);
+  border-radius: 20px;
+  background: var(--color-coral-3);
+  transition: transform $duration-fast ease;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.djLabel {
+  @include typo('caption-bold');
+  color: var(--color-coral);
+}
+
+.djBody {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.djText {
+  @include typo('body-m-medium');
+  color: var(--color-black);
+}
+
+.djArrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  background: var(--color-coral);
+  transform: rotate(180deg) scaleY(-1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gameCard {
+  @include focus-ring;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 76px;
+  padding: 12px 10px 0 12px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 20px;
+  background: var(--color-white);
+  overflow: hidden;
+  transition: background-color $duration-fast ease;
+
+  &:active {
+    background: var(--color-coral-background);
+  }
+}
+
+.gameTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gameTitle {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+  white-space: nowrap;
+}
+
+.gameDesc {
+  @include typo('caption');
+  color: var(--color-gray-600);
+  white-space: nowrap;
+}
+
+.onAir {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  @include typo('caption-bold');
+  color: var(--color-green);
+}
+
+.gameImage {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 46px;
+  height: auto;
+}
