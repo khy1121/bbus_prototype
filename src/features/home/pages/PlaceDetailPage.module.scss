@@ -1,0 +1,208 @@
+$hero-height: 291px;
+$bar-height: 104px;
+
+.page {
+  min-height: 100dvh;
+  background: var(--color-coral-background);
+}
+
+.layout {
+  position: relative;
+}
+
+.media {
+  position: relative;
+  height: $hero-height;
+}
+
+.topBar {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  height: auto;
+  padding: 5px 25px 0;
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+// 사진 위로 겹쳐 올라오는 시트 (Figma 10:6456: top 255, radius 30)
+.sheet {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: -36px;
+  padding: 27px 25px calc(#{$bar-height} + 24px + var(--safe-bottom));
+  border-radius: 30px 30px 0 0;
+  background: var(--color-coral-background);
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  @include typo('title-m-bold');
+  color: var(--color-black);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  @include typo('body-m-medium');
+  color: var(--color-gray-600);
+}
+
+.categoryChip {
+  pointer-events: none;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+
+  > span {
+    @include typo('body-m-regular-bold');
+  }
+}
+
+.intro {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-right: -25px;
+  overflow-x: auto;
+  @include hide-scrollbar;
+}
+
+.thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 129px;
+  height: 71px;
+  border-radius: 10px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Figma 10:6460 — "+5" 글래스 블랙 원
+.more {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 18px;
+  background: linear-gradient(
+    72.89deg,
+    rgba(0, 0, 0, 0.24) 10.87%,
+    rgba(0, 0, 0, 0.12) 57.44%,
+    rgba(0, 0, 0, 0.24) 89.39%
+  );
+  @include typo('caption');
+  color: var(--color-white);
+}
+
+// 하단 고정 버튼 바 (Figma 10:6533)
+.actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 19px 25px calc(35px + var(--safe-bottom));
+  border-radius: 30px 30px 0 0;
+  background: var(--color-white);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+
+  > button {
+    padding: 0 12px;
+  }
+}
+
+@include tablet-up {
+  .layout {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .actions {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+// ---------- 데스크톱 (옵션 A): 좌측 사진 / 우측 정보 2단 ----------
+@include desktop {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 40px;
+    max-width: 1120px;
+    padding: 40px 48px;
+  }
+
+  .media {
+    position: sticky;
+    top: 40px;
+    height: 560px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .topBar {
+    padding: 16px 16px 0;
+  }
+
+  .sheet {
+    margin-top: 0;
+    padding: 0 0 40px;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .thumbs {
+    margin-right: 0;
+  }
+
+  .actions {
+    position: static;
+    max-width: none;
+    margin: 8px 0 0;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+}
