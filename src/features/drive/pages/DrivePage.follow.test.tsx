@@ -44,4 +44,14 @@ describe('DrivePage — 차량 따라가기', () => {
     const km = cumulativeKm(route.path).at(-1)! * routeProgress(route, useDriveSessionStore.getState().elapsedSec)
     expect(car).toHaveAttribute('data-direction', toDirection(headingAlongPath(route.path, km)))
   })
+
+  it('지나온 길은 지도에서 숨긴다 — 주행한 거리만큼 경로 진행 위치를 지도에 넘긴다', async () => {
+    useDriveStore.getState().startDrive({ name: 'a', destination })
+    renderDrive()
+    await waitFor(() => expect(useDriveSessionStore.getState().route).not.toBeNull())
+    const progress = () => Number(screen.getByRole('region', { name: '드라이브 지도' }).getAttribute('data-path-progress'))
+    expect(progress()).toBe(0)
+    advance(300)
+    expect(progress()).toBeGreaterThan(0)
+  })
 })

@@ -93,6 +93,7 @@ export function DrivePage() {
   const pathKm = useMemo(() => (route ? cumulativeKm(route.path) : null), [route])
   // 경로를 따라 실제 거리 비율만큼 이동한 지점 (길찾기 좌표는 점 간격이 고르지 않음)
   const carPosition = route && pathKm ? pointAtKm(route.path, pathKm[pathKm.length - 1] * progress, pathKm) : myPosition
+  const traveledKm = route && pathKm ? pathKm[pathKm.length - 1] * progress : 0
   const carDirection: Direction =
     route && pathKm ? toDirection(headingAlongPath(route.path, pathKm[pathKm.length - 1] * progress, pathKm)) : 'N'
   const stats = hasRoute
@@ -177,6 +178,8 @@ export function DrivePage() {
           level={hasRoute ? 8 : 5}
           markers={markers}
           path={route?.path}
+          // 지나온 길은 숨기고 남은 경로만 그린다
+          pathProgressKm={traveledKm}
           fitBounds={hasRoute}
           className={paused ? styles.blurred : undefined}
         />

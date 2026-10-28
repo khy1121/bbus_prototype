@@ -9,6 +9,7 @@ const calls = vi.hoisted(() => ({
   setCenter: 0,
   polylines: [] as { path: unknown[]; map: unknown }[],
   polylineCreated: 0,
+  pathUpdated: [] as number[],
   overlayCreated: 0,
   overlayMoved: 0,
   overlayRemoved: 0,
@@ -63,6 +64,9 @@ const fakeKakao = vi.hoisted(() => {
     setMap(map: unknown) {
       calls.polylines.push({ path: this.opts.path, map })
     }
+    setPath(path: unknown[]) {
+      calls.pathUpdated.push(path.length)
+    }
   }
   const event = {
     addListener: (_target: unknown, type: string, handler: () => void) => {
@@ -96,6 +100,7 @@ describe('KakaoMap (SDK 연동)', () => {
     calls.setCenter = 0
     calls.polylines = []
     calls.polylineCreated = 0
+    calls.pathUpdated = []
     calls.overlayCreated = 0
     calls.overlayMoved = 0
     calls.overlayRemoved = 0
@@ -193,5 +198,22 @@ describe('KakaoMap (SDK 연동)', () => {
     expect(calls.contentSet).toBe(1)
     expect(calls.overlayCreated).toBe(1)
     expect(render1).toHaveBeenCalledTimes(2)
+  })
+
+  it('pathProgressKm: 지나온 길은 그리지 않고, 경로선을 다시 만들지 않고 좌표만 갱신한다 (범위 맞춤은 전체 경로 기준 유지)', async () => {
+    const long = [
+      { lat: 37.4, lng: 127 },
+      { lat: 37.45, lng: 127 },
+      { lat: 37.5, lng: 127 },
+    ]
+    const { rerender } = render(<KakaoMap label="지도" center={long[0]} path={long} pathProgressKm={0} fitBounds />)
+    await waitFor(() => expect(calls.polylineCreated).toBeGreaterThan(0))
+    const created = calls.polylineCreated
+    const fits = calls.setBounds
+
+    rerender(<KakaoMap label="지도" center={long[0]} path={long} pathProgressKm={7} fitBounds />)
+    expect(calls.polylineCreated).toBe(created) // 다시 만들지 않음
+    expect(calls.pathUpdated.at(-1)).toBe(2) // 현재 지점 + 남은 꼭짓점 1개
+    expect(calls.setBounds).toBe(fits) // 전체 경로 기준이라 다시 맞추지 않음
   })
 })

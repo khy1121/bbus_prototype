@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import clsx from 'clsx'
+import { cumulativeKm, remainingPath } from '@/lib/geo'
 import { getKakaoMapKey, loadKakaoMaps } from '@/lib/kakao/loadKakaoMaps'
 import { colors } from '@/styles/tokens'
 import styles from './KakaoMap.module.scss'
@@ -27,6 +28,8 @@ type KakaoMapProps = {
   markers?: MapMarker[]
   /** 경로 폴리라인 */
   path?: LatLng[]
+  /** 경로 시작점부터 이미 지나온 거리(km). 주면 그 이후만 그린다 (범위 맞춤은 전체 경로 기준) */
+  pathProgressKm?: number
   /** 경로/마커가 모두 보이도록 범위 맞춤 */
   fitBounds?: boolean
   /** false 면 드래그/줌 불가 (읽기 전용 미리보기) */
@@ -53,6 +56,7 @@ export function KakaoMap({
   level = 6,
   markers = [],
   path,
+  pathProgressKm,
   fitBounds = false,
   interactive = true,
   onUserDrag,
@@ -207,7 +211,9 @@ export function KakaoMap({
     }
   }, [])
 
-  // 경로선 — 경로가 바뀔 때만 다시 그린다. 내비 스타일: 흰 테두리(아래) + 코랄 선(위)
+  // 경로선 — 경로가 바뀔 때만 새로 만든다. 내비 스타일: 흰 테두리(아래) + 코랄 선(위)
+  const polylinesRef = useRef<kakao.maps.Polyline[]>([])
+  const pathAcc = useMemo(() => (path && path.length > 1 ? cumulativeKm(path) : null), [path])
   useEffect(() => {
     const map = mapRef.current
     const k = window.kakao
@@ -217,8 +223,20 @@ export function KakaoMap({
       new k.maps.Polyline({ path: latLngs, strokeWeight, strokeColor, strokeOpacity: 1, strokeStyle: 'solid' })
     const polylines = [line(11, colors.white), line(7, colors.coral)]
     polylines.forEach((l) => l.setMap(map))
-    return () => polylines.forEach((l) => l.setMap(null))
+    polylinesRef.current = polylines
+    return () => {
+      polylines.forEach((l) => l.setMap(null))
+      polylinesRef.current = []
+    }
   }, [status, path])
+
+  // 지나온 길 숨기기 — 진행할 때마다 선을 다시 만들지 않고 좌표만 바꾼다 (확대·축소 중 깜빡임 방지)
+  useEffect(() => {
+    const k = window.kakao
+    if (status !== 'ready' || !k || !path || !pathAcc || pathProgressKm === undefined) return
+    const visible = remainingPath(path, pathProgressKm, pathAcc).map((p) => new k.maps.LatLng(p.lat, p.lng))
+    polylinesRef.current.forEach((l) => l.setPath(visible))
+  }, [status, path, pathAcc, pathProgressKm])
 
   // 범위 맞춤 — 경로나 마커 구성(id)이 바뀔 때만. 차량 마커가 움직일 때마다 화면이 튀지 않게 한다.
   // 실제 경로는 좌표가 수천 개라 전체 직렬화 대신 길이 + 양 끝점으로 식별
