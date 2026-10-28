@@ -16,6 +16,8 @@
   inset: -12px;
   z-index: -1;
   width: calc(100% + 24px);
+  // 전역 img 리셋(max-width: 100%)이 오른쪽 12px 를 잘라 흐림 가장자리가 흰 띠로 보이던 문제 방지
+  max-width: none;
   height: calc(100% + 24px);
   object-fit: cover;
   opacity: 0.8;
@@ -24,18 +26,19 @@
 
 .chips {
   display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  @include hide-scrollbar;
+  gap: 4px;
 }
 
+// Figma 10:15761 — 칩 3개가 배너 한 줄에 모두 들어간다 (81 + 101 + 129px).
+// 가로 스크롤 없이 한 줄에 맞추고, 화면이 더 좁으면 '추천 테마' 칩만 줄어들며 값을 말줄임한다.
 .chip {
   display: flex;
   align-items: center;
-  gap: 7px;
-  flex-shrink: 0;
+  gap: 5px;
+  flex: 0 0 auto;
+  min-width: 0;
   height: 46px;
-  padding: 4px 13px 3px 8px;
+  padding: 4px 8px 3px;
   border-radius: 10px;
   background: linear-gradient(
     61.45deg,
@@ -43,12 +46,25 @@
     rgba(255, 255, 255, 0.48) 19.88%,
     rgba(255, 255, 255, 0.8) 77.28%
   );
+
+  &:last-child {
+    flex: 0 1 auto;
+  }
+
+  > :first-child {
+    flex-shrink: 0;
+  }
 }
 
 .chipTexts {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   white-space: nowrap;
+
+  > span {
+    @include ellipsis;
+  }
 }
 
 .chipLabel {
