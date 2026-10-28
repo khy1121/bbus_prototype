@@ -1,0 +1,93 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-top: 20px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.thumb {
+  flex-shrink: 0;
+}
+
+.summaryBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin-bottom: 5px;
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('body-m-regular');
+  color: var(--color-gray-600);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 30px;
+  padding-left: 12px;
+  border-radius: 5px;
+  background: var(--color-divider);
+}
+
+.url {
+  @include typo('caption');
+  color: var(--color-gray-600);
+  @include ellipsis;
+}
+
+.copy {
+  @include focus-ring;
+  display: flex;
+  flex-shrink: 0;
+
+  img {
+    width: 34px;
+    height: 35px;
+  }
+}
+
+.otherTitle {
+  margin-bottom: 18px;
+  @include typo('body-m-medium');
+  color: var(--color-black);
+}
+
+.channels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px 0 9px;
+}
+
+.channel {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  border-radius: $radius-sm;
+  @include typo('body-s');
+  color: var(--color-black);
+  white-space: nowrap;
+
+  img {
+    width: 57px;
+    height: 57px;
+    border-radius: 50%;
+  }
+}
