@@ -1,0 +1,134 @@
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  padding: 0 25px;
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('body-m');
+  color: var(--color-gray-600);
+}
+
+.chips {
+  display: flex;
+  gap: 12px;
+  margin-top: 17px;
+  padding: 5px 25px;
+  overflow-x: auto;
+  @include hide-scrollbar;
+}
+
+.list {
+  display: flex;
+  gap: 15px;
+  margin-top: 14px;
+  padding: 5px 25px 8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  @include hide-scrollbar;
+
+  > li {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    scroll-margin-left: 25px;
+  }
+}
+
+// 새로고침 카드 (디자인 없음 → 카드와 같은 크기/톤으로 추가)
+.refresh {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100px;
+  height: 164px;
+  border: 1px dashed var(--color-coral-stroke);
+  border-radius: 10px;
+  background: var(--color-coral-3);
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.refreshIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  transition: transform $duration-base $ease-out;
+
+  .refresh:active & {
+    transform: rotate(-90deg);
+  }
+}
+
+.refreshText {
+  @include typo('caption-bold');
+  color: var(--color-coral-pressed);
+  text-align: center;
+}
+
+// Figma 10:6450 — 319×6 트랙
+.progressTrack {
+  position: relative;
+  width: calc(100% - 71px);
+  max-width: 319px;
+  height: 6px;
+  margin: 4px auto 0;
+  border-radius: 1000px;
+  background: rgba(255, 214, 204, 0.5);
+  overflow: hidden;
+}
+
+.progressThumb {
+  position: absolute;
+  top: 0;
+  width: 58%;
+  height: 100%;
+  border-radius: 1000px;
+  background: var(--color-coral-stroke);
+  transition: left 80ms linear;
+}
+
+@include desktop {
+  .heading,
+  .chips {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(152px, 1fr));
+    padding: 5px 0 8px;
+    overflow: visible;
+
+    > li > * {
+      width: 100%;
+    }
+  }
+
+  .refresh {
+    width: 100%;
+  }
+
+  .progressTrack {
+    display: none;
+  }
+}
