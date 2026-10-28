@@ -1,0 +1,45 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 25px 24px;
+
+  @include tablet-up {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  @include desktop {
+    padding-top: 40px;
+  }
+}
+
+.title {
+  @include typo('title-s-bold');
+  color: var(--color-black);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: $radius-xl;
+  background: var(--color-coral-3);
+}
+
+.cardTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardTitle {
+  @include typo('body-m-bold');
+  color: var(--color-black);
+}
+
+.cardDesc {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+}

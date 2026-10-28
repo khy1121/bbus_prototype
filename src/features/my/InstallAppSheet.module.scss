@@ -1,0 +1,130 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+  text-align: center;
+
+  > button {
+    margin-top: 16px;
+  }
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 40px; // 닫기 버튼 자리
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: $radius-lg;
+  background: var(--color-white);
+  text-align: left;
+  transition: background-color $duration-fast ease;
+
+  &:active {
+    background: var(--color-coral-3);
+  }
+}
+
+.emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-md;
+  background: var(--color-coral-3);
+  font-size: 20px;
+}
+
+.optionTexts {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.optionLabel {
+  @include typo('body-m-bold');
+  color: var(--color-black);
+}
+
+.optionDesc {
+  @include typo('caption');
+  color: var(--color-gray-600);
+}
+
+.chevron {
+  font-size: 22px;
+  color: var(--color-gray-400);
+}
+
+.guideHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: -8px;
+  padding-right: 40px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step {
+  display: flex;
+  gap: 12px;
+  @include typo('body-m');
+  color: var(--color-gray-900);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  @include typo('caption-bold');
+  color: var(--color-white);
+}
+
+.note {
+  @include typo('caption');
+  color: var(--color-gray-400);
+}

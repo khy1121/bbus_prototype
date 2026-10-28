@@ -2,6 +2,7 @@ import { createBrowserRouter, type RouteObject } from 'react-router-dom'
 import { driveRoutes } from '@/features/drive/routes'
 import { homeRoutes, homeTabRoutes } from '@/features/home/routes'
 import { mapRoutes, mapTabRoutes } from '@/features/map/routes'
+import { MyPage } from '@/features/my/MyPage'
 import { AppLayout, TabLayout } from './layouts/AppLayout'
 import { PlaceholderPage } from './PlaceholderPage'
 
@@ -16,7 +17,7 @@ export const routes: RouteObject[] = [
           ...homeTabRoutes, // '/'
           ...mapTabRoutes, // '/map'
           { path: '/studio', element: <PlaceholderPage title="스튜디오" /> },
-          { path: '/my', element: <PlaceholderPage title="마이" /> },
+          { path: '/my', element: <MyPage /> },
         ],
       },
       // 전체 화면 (하단 네비 없음)
