@@ -1,0 +1,87 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 25px;
+  background: rgba(0, 0, 0, 0.25);
+  animation: fadeIn $duration-base ease;
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  padding: 43px 19px 22px 20px;
+  border-radius: 30px;
+  background: var(--color-coral-background);
+  outline: none;
+  animation: popIn $duration-base $ease-out;
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 19px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 21px;
+}
+
+.illustration {
+  display: flex;
+  justify-content: center;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  text-align: center;
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+  white-space: pre-line;
+}
+
+.description {
+  @include typo('body-s');
+  color: var(--color-gray-400);
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+
+  > * {
+    flex: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.actions > .cancel {
+  flex: 0 0 96px;
+}
