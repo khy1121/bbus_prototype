@@ -1,0 +1,109 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.highway {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 3px 11px 3px 9px;
+  border-radius: $radius-full;
+  background: var(--color-coral-3);
+  @include typo('caption');
+  color: var(--color-coral-pressed2);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name {
+  @include typo('title-s-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('caption');
+  color: var(--color-gray-400);
+  white-space: pre-line;
+}
+
+.stamp {
+  flex-shrink: 0;
+  width: 66px;
+  height: 66px;
+  margin-top: 12px;
+}
+
+.menuTitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  @include typo('body-m-regular-bold');
+  color: var(--color-black);
+
+  &::before {
+    content: '';
+    width: 3px;
+    height: 15px;
+    border-radius: $radius-full;
+    background: var(--color-coral-pressed2);
+  }
+}
+
+.menus {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.menu {
+  position: relative;
+  height: 119px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-white);
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.05));
+}
+
+.menuImage {
+  width: 100%;
+  height: 74px;
+  object-fit: cover;
+}
+
+.menuInfo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 63px;
+  height: 56px;
+  padding: 7px 9px 9px;
+  border-radius: 0 0 10px 10px;
+  background: var(--color-white);
+}
+
+.menuName {
+  @include typo('body-m-regular-bold');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.menuDesc {
+  @include typo('caption-s');
+  color: var(--color-gray-600);
+  @include ellipsis;
+}
