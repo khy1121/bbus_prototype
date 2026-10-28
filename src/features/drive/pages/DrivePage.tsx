@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ConfirmDialog, DraggableSheet, SegmentedControl, type SnapPoint } from '@/components'
-import { KakaoMap } from '@/components/KakaoMap/KakaoMap'
+import { KakaoMap, type LatLng } from '@/components/KakaoMap/KakaoMap'
 import { DriveStartSheet } from '@/features/drive-start/DriveStartSheet'
 import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { cumulativeKm, pointAtKm } from '@/lib/geo'
@@ -86,6 +86,15 @@ export function DrivePage() {
       }
     : { elapsedSec: null, distanceKm: null, arrival: null }
 
+  // 카카오내비처럼: 기본은 차량을 따라가고, 사용자가 지도를 끌면 그 자리에 멈춘다. '현재 위치'로 다시 따라간다.
+  const [pinnedCenter, setPinnedCenter] = useState<LatLng | null>(null)
+  const mapCenter = pinnedCenter ?? carPosition
+  const stopFollowing = () => setPinnedCenter((prev) => prev ?? carPosition)
+  const handleLocate = () => {
+    setPinnedCenter(null)
+    if (!hasRoute) getCurrentLocation().then((l) => setMyPosition(l.position))
+  }
+
   const markers = useMemo(() => {
     if (!route || !destination)
       return [{ id: 'me', position: myPosition, render: imageMarker(images.carMarker, 53, '현재 위치') }]
@@ -122,7 +131,8 @@ export function DrivePage() {
       <div className={styles.mapArea}>
         <KakaoMap
           label="드라이브 지도"
-          center={carPosition}
+          center={mapCenter}
+          onUserDrag={stopFollowing}
           level={hasRoute ? 8 : 5}
           markers={markers}
           path={route?.path}
@@ -155,7 +165,7 @@ export function DrivePage() {
           <div className={styles.mapButtons}>
             {destination && <GlassButton icon={icons.exit} label="드라이브 나가기" onClick={() => setExitOpen(true)} />}
             {destination && <GlassButton icon={icons.stop} label="주행 중단" onClick={pause} disabled={paused} />}
-            <GlassButton icon={icons.locate} label="현재 위치" onClick={() => getCurrentLocation().then((l) => setMyPosition(l.position))} />
+            <GlassButton icon={icons.locate} label="현재 위치" onClick={handleLocate} />
           </div>
           <DriveStatsCard {...stats} className={styles.stats} />
         </div>
