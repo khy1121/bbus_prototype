@@ -1,0 +1,84 @@
+@use '../styles/drive' as *;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  @include typo('body-s');
+  @include gradient-text-2;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  height: 23px;
+  padding: 0 12px;
+  border-radius: $radius-full;
+  background: var(--color-coral-2);
+  @include typo('caption');
+  color: var(--color-white);
+  white-space: nowrap;
+}
+
+.manual {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  height: 28px;
+}
+
+.board {
+  position: relative;
+  width: 100%;
+  max-width: 359px;
+  margin: 0 auto;
+  aspect-ratio: 359 / 630;
+}
+
+.boardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.slot {
+  @include focus-ring;
+  position: absolute;
+  width: 18.4%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transition: transform $duration-fast ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
