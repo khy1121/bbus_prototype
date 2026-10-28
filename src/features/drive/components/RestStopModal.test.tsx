@@ -15,6 +15,12 @@ describe('RestStopModal (05 휴게소 상세)', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(4)
   })
 
+  it('고속도로 이름을 모르는 휴게소는 고속도로 표시를 숨긴다', () => {
+    setup(<RestStopModal restStop={{ ...stop, highway: '' }} acquired={false} onClose={() => {}} />)
+    expect(screen.queryByText('수도권제1순환고속도로')).not.toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: '시흥하늘휴게소' })).toBeInTheDocument()
+  })
+
   it('스탬프 획득 여부를 이미지 대체텍스트로 표시한다', () => {
     const { rerender } = setup(<RestStopModal restStop={stop} acquired={false} onClose={() => {}} />)
     expect(screen.getByRole('img', { name: '스탬프 미획득' })).toBeInTheDocument()

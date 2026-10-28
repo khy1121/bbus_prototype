@@ -65,6 +65,7 @@
 }
 
 .menus {
+  margin-top: -3px; // 제목 아래 5px (Figma 10:10293)
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 12px;

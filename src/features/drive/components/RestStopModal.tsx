@@ -19,10 +19,13 @@ export function RestStopModal({ restStop, acquired, onClose }: RestStopModalProp
   return (
     <DriveDialog open onClose={onClose} label={restStop.name}>
       <div className={styles.content}>
-        <span className={styles.highway}>
-          <img src={icons.pinCoral} alt="" aria-hidden />
-          {restStop.highway}
-        </span>
+        {/* 실제 검색된 휴게소는 고속도로 이름을 모를 수 있다 */}
+        {restStop.highway && (
+          <span className={styles.highway}>
+            <img src={icons.pinCoral} alt="" aria-hidden />
+            {restStop.highway}
+          </span>
+        )}
         <div className={styles.head}>
           <div className={styles.texts}>
             <h2 className={styles.name}>{restStop.name}</h2>
