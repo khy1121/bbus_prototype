@@ -1,0 +1,20 @@
+.hashTag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: $radius-full;
+  background: var(--color-coral-2);
+  color: var(--color-coral-pressed);
+  white-space: nowrap;
+}
+
+.sm {
+  padding: 4px 10px;
+  @include typo('caption-bold');
+}
+
+.md {
+  padding: 4px 12px;
+  @include typo('body-s-medium');
+}
