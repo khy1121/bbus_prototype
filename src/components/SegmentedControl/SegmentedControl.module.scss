@@ -1,0 +1,60 @@
+.root {
+  display: flex;
+  align-items: center;
+  border-radius: $radius-full;
+}
+
+.tab {
+  @include focus-ring;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-full;
+  white-space: nowrap;
+  transition:
+    background-color $duration-base $ease-out,
+    color $duration-base $ease-out;
+}
+
+// Figma 10:14157
+.tabs {
+  height: 40px;
+  padding: 3px;
+  background: var(--color-divider);
+
+  .tab {
+    height: 34px;
+    color: var(--color-gray-400);
+    @include typo('body-s');
+  }
+
+  .selected {
+    background: var(--color-coral-2);
+    color: var(--color-gray-900);
+    @include typo('body-s-medium');
+  }
+}
+
+// Figma 10:15722
+.toggle {
+  display: inline-flex;
+  height: 33px;
+  padding: 2px;
+  background: var(--color-coral-background);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+
+  .tab {
+    width: 70px;
+    height: 29px;
+    flex: none;
+    color: var(--color-gray-400);
+    @include typo('body-s');
+  }
+
+  .selected {
+    background: var(--color-coral);
+    color: var(--color-white);
+    @include typo('body-s-medium');
+  }
+}
