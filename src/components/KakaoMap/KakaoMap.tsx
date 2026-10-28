@@ -146,17 +146,39 @@ export function KakaoMap({
     return () => k.maps.event.removeListener(map, 'dragstart', handler)
   }, [status])
 
-  // 마커 + 폴리라인
+  // 마커 — id 기준으로 유지한다. 위치만 바뀐 마커(운행 중 차량)는 옮기기만 하고 다시 만들지 않는다.
+  // (매번 지우고 다시 그리면 확대·축소 애니메이션 도중 마커가 깜빡이거나 어긋나 보인다)
+  const overlaysRef = useRef(new Map<string, { overlay: kakao.maps.CustomOverlay; marker: MapMarker }>())
   useEffect(() => {
     const map = mapRef.current
     const k = window.kakao
     if (status !== 'ready' || !map || !k) return
+    const current = overlaysRef.current
+    const nextIds = new Set(markers.map((m) => m.id))
 
-    const overlays = markers.map((m) => {
+    // 사라진 마커 제거
+    for (const [id, entry] of current) {
+      if (!nextIds.has(id)) {
+        entry.overlay.setMap(null)
+        current.delete(id)
+      }
+    }
+
+    for (const m of markers) {
+      const entry = current.get(m.id)
+      if (entry) {
+        const prev = entry.marker
+        if (prev.position.lat !== m.position.lat || prev.position.lng !== m.position.lng) {
+          entry.overlay.setPosition(new k.maps.LatLng(m.position.lat, m.position.lng))
+        }
+        if (prev.zIndex !== m.zIndex && m.zIndex !== undefined) entry.overlay.setZIndex(m.zIndex)
+        entry.marker = m // 클릭 핸들러는 항상 최신 마커 기준
+        continue
+      }
       const content = m.render ? m.render() : defaultMarker()
       if (m.onClick) {
         content.style.cursor = 'pointer'
-        content.addEventListener('click', m.onClick)
+        content.addEventListener('click', () => current.get(m.id)?.marker.onClick?.())
       }
       const overlay = new k.maps.CustomOverlay({
         position: new k.maps.LatLng(m.position.lat, m.position.lng),
@@ -166,36 +188,31 @@ export function KakaoMap({
         clickable: m.clickable ?? Boolean(m.onClick),
       })
       overlay.setMap(map)
-      return overlay
-    })
-
-    // 내비 스타일 경로: 흰 테두리(아래) + 코랄 선(위)
-    const routeLatLngs = path && path.length > 1 ? path.map((p) => new k.maps.LatLng(p.lat, p.lng)) : null
-    const polylines = routeLatLngs
-      ? [
-          new k.maps.Polyline({
-            path: routeLatLngs,
-            strokeWeight: 11,
-            strokeColor: colors.white,
-            strokeOpacity: 1,
-            strokeStyle: 'solid',
-          }),
-          new k.maps.Polyline({
-            path: routeLatLngs,
-            strokeWeight: 7,
-            strokeColor: colors.coral,
-            strokeOpacity: 1,
-            strokeStyle: 'solid',
-          }),
-        ]
-      : []
-    polylines.forEach((line) => line.setMap(map))
-
-    return () => {
-      overlays.forEach((o) => o.setMap(null))
-      polylines.forEach((line) => line.setMap(null))
+      current.set(m.id, { overlay, marker: m })
     }
-  }, [status, markers, path])
+  }, [status, markers])
+
+  // 지도가 사라질 때 마커 정리
+  useEffect(() => {
+    const current = overlaysRef.current
+    return () => {
+      current.forEach((entry) => entry.overlay.setMap(null))
+      current.clear()
+    }
+  }, [])
+
+  // 경로선 — 경로가 바뀔 때만 다시 그린다. 내비 스타일: 흰 테두리(아래) + 코랄 선(위)
+  useEffect(() => {
+    const map = mapRef.current
+    const k = window.kakao
+    if (status !== 'ready' || !map || !k || !path || path.length < 2) return
+    const latLngs = path.map((p) => new k.maps.LatLng(p.lat, p.lng))
+    const line = (strokeWeight: number, strokeColor: string) =>
+      new k.maps.Polyline({ path: latLngs, strokeWeight, strokeColor, strokeOpacity: 1, strokeStyle: 'solid' })
+    const polylines = [line(11, colors.white), line(7, colors.coral)]
+    polylines.forEach((l) => l.setMap(map))
+    return () => polylines.forEach((l) => l.setMap(null))
+  }, [status, path])
 
   // 범위 맞춤 — 경로나 마커 구성(id)이 바뀔 때만. 차량 마커가 움직일 때마다 화면이 튀지 않게 한다.
   // 실제 경로는 좌표가 수천 개라 전체 직렬화 대신 길이 + 양 끝점으로 식별

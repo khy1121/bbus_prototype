@@ -52,6 +52,7 @@ declare namespace kakao.maps {
     constructor(options: { position: LatLng; content: HTMLElement | string; yAnchor?: number; xAnchor?: number; zIndex?: number; clickable?: boolean })
     setMap(map: Map | null): void
     setPosition(latlng: LatLng): void
+    setZIndex(zIndex: number): void
   }
 
   class Polyline {

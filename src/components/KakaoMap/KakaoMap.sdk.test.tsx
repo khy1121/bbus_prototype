@@ -8,6 +8,10 @@ const calls = vi.hoisted(() => ({
   setLevel: 0,
   setCenter: 0,
   polylines: [] as { path: unknown[]; map: unknown }[],
+  polylineCreated: 0,
+  overlayCreated: 0,
+  overlayMoved: 0,
+  overlayRemoved: 0,
   listeners: {} as Record<string, () => void>,
 }))
 
@@ -35,12 +39,22 @@ const fakeKakao = vi.hoisted(() => {
     }
   }
   class CustomOverlay {
-    setMap() {}
+    constructor() {
+      calls.overlayCreated += 1
+    }
+    setMap(map: unknown) {
+      if (map === null) calls.overlayRemoved += 1
+    }
+    setPosition() {
+      calls.overlayMoved += 1
+    }
+    setZIndex() {}
   }
   class Polyline {
     opts: { path: unknown[] }
     constructor(opts: { path: unknown[] }) {
       this.opts = opts
+      calls.polylineCreated += 1
     }
     setMap(map: unknown) {
       calls.polylines.push({ path: this.opts.path, map })
@@ -77,6 +91,10 @@ describe('KakaoMap (SDK 연동)', () => {
     calls.setLevel = 0
     calls.setCenter = 0
     calls.polylines = []
+    calls.polylineCreated = 0
+    calls.overlayCreated = 0
+    calls.overlayMoved = 0
+    calls.overlayRemoved = 0
     calls.listeners = {}
   })
 
@@ -121,5 +139,39 @@ describe('KakaoMap (SDK 연동)', () => {
     const newPath = [path[0], { lat: 37.6, lng: 127.1 }]
     rerender(<KakaoMap label="지도" center={path[0]} path={newPath} markers={[car(37.5)]} fitBounds />)
     await waitFor(() => expect(calls.setBounds).toBe(2))
+  })
+
+  it('차량 마커만 움직이면 기존 오버레이를 옮기기만 하고, 경로선·다른 마커는 다시 만들지 않는다 (확대 중 깜빡임 방지)', async () => {
+    const dest: MapMarker = { id: 'dest', position: { lat: 37.52, lng: 126.97 } }
+    const { rerender } = render(<KakaoMap label="지도" center={path[0]} path={path} markers={[dest, car(37.48)]} />)
+    await waitFor(() => expect(calls.overlayCreated).toBe(2))
+    const lines = calls.polylineCreated
+
+    rerender(<KakaoMap label="지도" center={path[0]} path={path} markers={[dest, car(37.49)]} />)
+    rerender(<KakaoMap label="지도" center={path[0]} path={path} markers={[dest, car(37.5)]} />)
+
+    expect(calls.overlayCreated).toBe(2) // 새로 만들지 않음
+    expect(calls.overlayRemoved).toBe(0)
+    expect(calls.overlayMoved).toBeGreaterThanOrEqual(2) // 차량만 이동
+    expect(calls.polylineCreated).toBe(lines) // 경로선 유지
+  })
+
+  it('마커가 새로 생기거나 사라질 때만 오버레이를 추가·제거한다', async () => {
+    const a: MapMarker = { id: 'a', position: { lat: 37.5, lng: 127 } }
+    const b: MapMarker = { id: 'b', position: { lat: 37.6, lng: 127.1 } }
+    const { rerender } = render(<KakaoMap label="지도" center={path[0]} markers={[a]} />)
+    await waitFor(() => expect(calls.overlayCreated).toBe(1))
+    rerender(<KakaoMap label="지도" center={path[0]} markers={[a, b]} />)
+    expect(calls.overlayCreated).toBe(2)
+    rerender(<KakaoMap label="지도" center={path[0]} markers={[b]} />)
+    expect(calls.overlayRemoved).toBe(1)
+  })
+
+  it('경로가 바뀌면 경로선을 다시 그린다', async () => {
+    const { rerender } = render(<KakaoMap label="지도" center={path[0]} path={path} />)
+    await waitFor(() => expect(calls.polylineCreated).toBeGreaterThan(0))
+    const before = calls.polylineCreated
+    rerender(<KakaoMap label="지도" center={path[0]} path={[path[0], { lat: 37.7, lng: 127.2 }]} />)
+    expect(calls.polylineCreated).toBeGreaterThan(before)
   })
 })
