@@ -9,7 +9,7 @@ import { cumulativeKm, pointAtKm } from '@/lib/geo'
 import { headingAlongPath, toDirection, type Direction } from '@/lib/heading'
 import { useDriveStore } from '@/stores/driveStore'
 import { getRestStops, getCurrentLocation } from '../api'
-import { carByDirection, icons, images } from '../assets'
+import { CAR_MARKER_SIZE, carByDirection, icons, images } from '../assets'
 import { ContentPanel } from '../components/ContentPanel'
 import { DriveStatsCard } from '../components/DriveStatsCard'
 import { GlassButton } from '../components/GlassButton'
@@ -92,8 +92,7 @@ export function DrivePage() {
   const progress = route ? routeProgress(route, elapsedSec) : 0
   const pathKm = useMemo(() => (route ? cumulativeKm(route.path) : null), [route])
   // 경로를 따라 실제 거리 비율만큼 이동한 지점 (길찾기 좌표는 점 간격이 고르지 않음)
-  const carPosition =
-    route && pathKm ? pointAtKm(route.path, pathKm[pathKm.length - 1] * progress, pathKm) : myPosition
+  const carPosition = route && pathKm ? pointAtKm(route.path, pathKm[pathKm.length - 1] * progress, pathKm) : myPosition
   const carDirection: Direction =
     route && pathKm ? toDirection(headingAlongPath(route.path, pathKm[pathKm.length - 1] * progress, pathKm)) : 'N'
   const stats = hasRoute
@@ -118,7 +117,13 @@ export function DrivePage() {
 
   const markers = useMemo(() => {
     if (!route || !destination)
-      return [{ id: 'me', position: myPosition, render: imageMarker(images.carMarker, 53, 49, '현재 위치') }]
+      return [
+        {
+          id: 'me',
+          position: myPosition,
+          render: imageMarker(carByDirection.S, CAR_MARKER_SIZE.width, CAR_MARKER_SIZE.height, '현재 위치'),
+        },
+      ]
     return [
       { id: 'start', position: route.path[0], render: imageMarker(icons.markerStart, 20, 23) },
       ...route.restStops.map((stop) => ({
@@ -133,14 +138,22 @@ export function DrivePage() {
         position: carPosition,
         // 진행 방향이 바뀔 때만 이미지를 교체 (오버레이는 유지)
         contentKey: carDirection,
-        render: imageMarker(carByDirection[carDirection], 53, 49, '현재 위치', carDirection),
+        render: imageMarker(
+          carByDirection[carDirection],
+          CAR_MARKER_SIZE.width,
+          CAR_MARKER_SIZE.height,
+          '현재 위치',
+          carDirection,
+        ),
         zIndex: 10,
       },
     ]
   }, [route, destination, myPosition, carPosition, carDirection])
 
   const restStopAlert =
-    hasRoute && status === 'driving' ? findRestStopAlert(route!, route!.distanceKm * progress, dismissedRestStopIds) : null
+    hasRoute && status === 'driving'
+      ? findRestStopAlert(route!, route!.distanceKm * progress, dismissedRestStopIds)
+      : null
 
   const handleEnd = () => {
     setExitOpen(false)
@@ -199,7 +212,12 @@ export function DrivePage() {
         </div>
 
         {paused && (
-          <button type="button" className={styles.paused} onClick={resume} aria-label="기록이 중단되었어요. 화면을 탭하면 주행을 다시 시작해요.">
+          <button
+            type="button"
+            className={styles.paused}
+            onClick={resume}
+            aria-label="기록이 중단되었어요. 화면을 탭하면 주행을 다시 시작해요."
+          >
             <span className={styles.pausedTitle}>기록이 중단되었어요.</span>
             <span className={styles.pausedDesc}>화면을 탭하면 주행을 다시 시작해요.</span>
           </button>
@@ -250,7 +268,11 @@ export function DrivePage() {
             .catch(() => setLocationError(true))
         }}
       />
-      <RestStopModal restStop={selectedStop} acquired={Boolean(selectedStop && stamps[selectedStop.id])} onClose={() => setSelectedStop(null)} />
+      <RestStopModal
+        restStop={selectedStop}
+        acquired={Boolean(selectedStop && stamps[selectedStop.id])}
+        onClose={() => setSelectedStop(null)}
+      />
     </div>
   )
 }
