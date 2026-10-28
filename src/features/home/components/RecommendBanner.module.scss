@@ -1,0 +1,55 @@
+.banner {
+  @include focus-ring;
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  height: 106px;
+  padding: 11px 16px 0 105px;
+  border-radius: 18px;
+  overflow: hidden;
+  isolation: isolate;
+  text-align: left;
+}
+
+.bg {
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  object-fit: cover;
+  filter: blur(3px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  max-width: 232px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+}
+
+.eyebrow {
+  @include typo('caption');
+  color: var(--color-gray-200);
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-white);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.subtitle {
+  @include typo('body-s');
+  color: var(--color-gray-100);
+}
