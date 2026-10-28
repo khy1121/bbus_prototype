@@ -1,0 +1,33 @@
+.topBar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: $header-height;
+  padding: 0 20px;
+  background: var(--color-coral-background);
+}
+
+.transparent {
+  background: transparent;
+}
+
+.back {
+  margin-left: -6px;
+}
+
+.title {
+  flex: 1;
+  @include typo('body-l-bold');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
