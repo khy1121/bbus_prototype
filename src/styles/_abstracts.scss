@@ -1,0 +1,4 @@
+// SCSS 모듈마다 자동 주입되는 진입점 (vite.config.ts > additionalData)
+// CSS를 출력하지 않는 변수/믹스인/함수만 forward 한다.
+@forward 'tokens';
+@forward 'mixins';
