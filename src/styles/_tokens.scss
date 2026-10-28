@@ -1,0 +1,143 @@
+// =============================================================
+// Design Tokens — Figma "Design System" (node 10:5229)
+// SCSS 변수는 빌드타임 계산용, 런타임은 CSS 변수(:root)를 사용한다.
+// =============================================================
+
+// ---------- Color: Main ----------
+$coral: #f88379;
+$coral-pressed: #cc5146;
+$coral-pressed2: #f49780;
+$coral-2: #fdd6d2;
+$coral-3: #ffeae6;
+$coral-stroke: #ffb19d;
+$coral-background: #fffbfb;
+$gradient-1: linear-gradient(171.23deg, #ffe7e1 79.91%, #ff705a 86.71%);
+$gradient-2: linear-gradient(132.77deg, #ffaa95 0.49%, #ff1d46 113.82%);
+
+// ---------- Color: Sub ----------
+$green: #06ba00;
+$divider: #faeeed;
+$red: #ff4144;
+$brown: #49251c;
+
+// ---------- Color: GrayScale ----------
+$black: #1a1a1a;
+$gray-900: #2e2b2c;
+$gray-800: #5b5658;
+$gray-600: #7b7578;
+$gray-400: #a89ea1;
+$gray-200: #d9d2d4;
+$gray-100: #f0edee;
+$white: #ffffff;
+
+$colors: (
+  'coral': $coral,
+  'coral-pressed': $coral-pressed,
+  'coral-pressed2': $coral-pressed2,
+  'coral-2': $coral-2,
+  'coral-3': $coral-3,
+  'coral-stroke': $coral-stroke,
+  'coral-background': $coral-background,
+  'green': $green,
+  'divider': $divider,
+  'red': $red,
+  'brown': $brown,
+  'black': $black,
+  'gray-900': $gray-900,
+  'gray-800': $gray-800,
+  'gray-600': $gray-600,
+  'gray-400': $gray-400,
+  'gray-200': $gray-200,
+  'gray-100': $gray-100,
+  'white': $white,
+);
+
+// ---------- Typography ----------
+$font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui,
+  'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+// Figma: 김정철 명조 → 무료 대체 폰트(Nanum Myeongjo)
+$font-serif: 'Nanum Myeongjo', 'Noto Serif KR', serif;
+
+$weight-light: 300;
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+
+// name: (size, weight, line-height)  — letter-spacing 은 전부 -2%
+$typography: (
+  // Title (line-height 140%)
+  'title-l': (32px, $weight-regular, 1.4),
+  'title-l-bold': (32px, $weight-semibold, 1.4),
+  'title-m': (28px, $weight-regular, 1.4),
+  'title-m-bold': (28px, $weight-semibold, 1.4),
+  'title-s': (24px, $weight-regular, 1.4),
+  'title-s-bold': (24px, $weight-semibold, 1.4),
+  // Body (line-height 150%)
+  'body-l': (20px, $weight-medium, 1.5),
+  'body-l-bold': (20px, $weight-semibold, 1.5),
+  'body-m': (16px, $weight-regular, 1.5),
+  'body-m-medium': (16px, $weight-medium, 1.5),
+  'body-m-bold': (16px, $weight-semibold, 1.5),
+  'body-m-regular': (15px, $weight-regular, 1.5),
+  'body-m-regular-bold': (15px, $weight-semibold, 1.5),
+  'body-s': (14px, $weight-medium, 1.5),
+  'body-s-medium': (14px, $weight-semibold, 1.5),
+  'body-s-bold': (14px, $weight-bold, 1.5),
+  // Others
+  'caption': (12px, $weight-medium, 1.5),
+  'caption-bold': (12px, $weight-semibold, 1.5),
+  'caption-s': (10px, $weight-regular, 1.5),
+  'caption-s-bold': (10px, $weight-medium, 1.5),
+  // Card (명조)
+  'card-myungjo': (14px, $weight-light, 1.5),
+);
+$letter-spacing: -0.02em;
+
+// ---------- Spacing (4pt grid) ----------
+$space: (
+  0: 0,
+  1: 4px,
+  2: 8px,
+  3: 12px,
+  4: 16px,
+  5: 20px,
+  6: 24px,
+  8: 32px,
+  10: 40px,
+);
+$page-gutter: 16px;
+
+// ---------- Radius ----------
+$radius-xs: 4px;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+$radius-2xl: 24px;
+$radius-full: 999px;
+
+// ---------- Shadow ----------
+$shadow-card: 0 2px 12px rgba(73, 37, 28, 0.08);
+$shadow-floating: 0 4px 20px rgba(73, 37, 28, 0.12);
+$shadow-sheet: 0 -4px 20px rgba(73, 37, 28, 0.08);
+
+// ---------- Layout ----------
+$mobile-max: 767px;
+$tablet-min: 768px;
+$desktop-min: 1024px;
+$app-max-width: 480px;
+$bottom-nav-height: 72px;
+$header-height: 56px;
+
+// ---------- Z-index ----------
+$z-sheet: 100;
+$z-nav: 200;
+$z-overlay: 900;
+$z-modal: 1000;
+$z-toast: 1100;
+
+// ---------- Motion ----------
+$ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+$duration-fast: 150ms;
+$duration-base: 250ms;
