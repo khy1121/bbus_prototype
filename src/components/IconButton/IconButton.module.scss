@@ -1,0 +1,62 @@
+$glass-bg: linear-gradient(
+  78.16deg,
+  rgba(255, 255, 255, 0.65) 1.2%,
+  rgba(255, 255, 255, 0.39) 34.32%,
+  rgba(255, 255, 255, 0.65) 85.2%
+);
+$glass-bg-pressed: linear-gradient(
+  78.16deg,
+  rgba(202, 202, 202, 0.65) 1.2%,
+  rgba(202, 202, 202, 0.39) 34.32%,
+  rgba(202, 202, 202, 0.65) 85.2%
+);
+
+.iconButton {
+  @include focus-ring;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background $duration-fast ease;
+
+  img {
+    pointer-events: none;
+  }
+}
+
+.glass {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  border: 0.5px solid var(--color-white);
+  background: $glass-bg;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+
+  &:active {
+    border-color: #b4b4b4;
+    background: $glass-bg-pressed;
+  }
+}
+
+.soft {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--color-divider);
+
+  &:active {
+    background: var(--color-coral-2);
+  }
+}
+
+.plain {
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: $radius-sm;
+
+  &:active {
+    background: var(--color-divider);
+  }
+}
