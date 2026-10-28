@@ -40,6 +40,7 @@ export function CalendarSheet({ open, onClose, onSelect, recordDates, initialMon
       return { year: d.getFullYear(), month: d.getMonth() + 1 }
     })
 
+  const [todayYear, todayMonth] = today.split('-').map(Number)
   const highlighted = selected ?? today
   const recordSet = new Set(recordDates)
 
@@ -58,9 +59,12 @@ export function CalendarSheet({ open, onClose, onSelect, recordDates, initialMon
               <img src={backIcon} alt="" aria-hidden />
             </button>
             <h2 className={styles.title}>{`${view.year}년 ${view.month}월`}</h2>
-            <button type="button" className={clsx(styles.nav, styles.next)} aria-label="다음 달" onClick={() => move(1)}>
-              <img src={backIcon} alt="" aria-hidden />
-            </button>
+            {/* 기록은 과거에만 있으므로 오늘이 있는 달 이후로는 넘기지 않는다 */}
+            {view.year * 12 + view.month < todayYear * 12 + todayMonth && (
+              <button type="button" className={clsx(styles.nav, styles.next)} aria-label="다음 달" onClick={() => move(1)}>
+                <img src={backIcon} alt="" aria-hidden />
+              </button>
+            )}
           </div>
           <div className={styles.grid} role="grid">
             <div role="row" className={styles.row}>

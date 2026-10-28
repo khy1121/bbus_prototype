@@ -113,8 +113,12 @@ describe('CalendarSheet', () => {
     await user.click(screen.getByRole('button', { name: '이전 달' }))
     expect(screen.getByText('2026년 9월')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '다음 달' }))
-    await user.click(screen.getByRole('button', { name: '다음 달' }))
-    expect(screen.getByText('2026년 11월')).toBeInTheDocument()
+    expect(screen.getByText('2026년 10월')).toBeInTheDocument()
+  })
+
+  it('오늘이 있는 달에서는 다음 달 버튼이 없다 (Figma 10:14661)', () => {
+    setup(<CalendarSheet {...props} onSelect={() => {}} />)
+    expect(screen.queryByRole('button', { name: '다음 달' })).not.toBeInTheDocument()
   })
 })
 
