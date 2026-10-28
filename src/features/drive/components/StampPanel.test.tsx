@@ -9,7 +9,7 @@ describe('StampPanel (06 휴게소 스탬프)', () => {
 
   it('안내 문구와 획득/전체 개수를 보여준다', () => {
     setup(<StampPanel restStops={MOCK_REST_STOPS} />)
-    expect(screen.getByText('함께 모아가는 작은 드라이브의 기록')).toBeInTheDocument()
+    expect(screen.getByText('함께 모아가는 작은 드라이브 기록')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '휴게소 스탬프' })).toBeInTheDocument()
     expect(screen.getByText('3 / 16')).toBeInTheDocument()
   })

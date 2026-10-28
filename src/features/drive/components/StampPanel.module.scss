@@ -3,7 +3,7 @@
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px; // 제목 → 스탬프판 (Figma 10:13162 → 10:13145)
 }
 
 .header {
@@ -36,9 +36,9 @@
   display: inline-flex;
   align-items: center;
   height: 23px;
-  padding: 0 12px;
+  padding: 3px 14px 2px 15px;
   border-radius: $radius-full;
-  background: var(--color-coral-2);
+  background: var(--color-coral-pressed2); // Figma 10:13168
   @include typo('caption');
   color: var(--color-white);
   white-space: nowrap;

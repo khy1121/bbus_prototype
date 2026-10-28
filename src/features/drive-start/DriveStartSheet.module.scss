@@ -22,3 +22,8 @@
   @include typo('body-m');
   color: var(--color-gray-600);
 }
+
+// Figma 10:16885: 입력칸(340)보다 양옆 9px 좁은 322px
+.submit {
+  width: calc(100% - 18px);
+}

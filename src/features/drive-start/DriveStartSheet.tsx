@@ -53,11 +53,11 @@ export function DriveStartSheet({
           autoFocus
         />
         {isRename ? (
-          <Button type="submit" size="pill" fullWidth>
+          <Button type="submit" size="pill" className={styles.submit} leftIcon={<Icon name="car-button" />}>
             수정 완료
           </Button>
         ) : (
-          <Button type="submit" size="pill" fullWidth leftIcon={<Icon name="car-button" />}>
+          <Button type="submit" size="pill" className={styles.submit} leftIcon={<Icon name="car-button" />}>
             {`붕붕! ${carName} 출발`}
           </Button>
         )}

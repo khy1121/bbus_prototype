@@ -45,7 +45,7 @@ export const StampPanel = memo(function StampPanel({ restStops }: StampPanelProp
     <section className={styles.panel} aria-labelledby="stamp-title">
       <div className={styles.header}>
         <p className={styles.eyebrow}>
-          함께 모아가는 작은 드라이브의 기록
+          함께 모아가는 작은 드라이브 기록
           <img src={icons.roadMap} alt="" aria-hidden />
         </p>
         <div className={styles.titleRow}>
