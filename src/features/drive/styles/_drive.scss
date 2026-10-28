@@ -1,0 +1,37 @@
+// 드라이브 모드 공용 스타일 (Figma '글래스 배경' 등)
+
+@mixin glass($angle: 78deg) {
+  background: linear-gradient(
+    $angle,
+    rgba(255, 255, 255, 0.65) 1.2%,
+    rgba(255, 255, 255, 0.39) 34.32%,
+    rgba(255, 255, 255, 0.65) 85.2%
+  );
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+// 그라데이션 텍스트 (Main/그라데이션2)
+@mixin gradient-text-2 {
+  background: linear-gradient(168deg, #ffaa95 0.5%, #ff1d46 113.8%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// 그라데이션 텍스트 (Main/그라데이션 — 코랄)
+@mixin gradient-text-1 {
+  background: linear-gradient(163deg, #ffe7e1 -20%, #ff705a 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+// 서브 화면 하단 고정 버튼 영역
+@mixin bottom-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 25px calc(34px + var(--safe-bottom));
+}
