@@ -124,20 +124,26 @@ export function KakaoMap({
         : null
     polyline?.setMap(map)
 
-    if (fitBounds) {
-      const points = [...(path ?? []), ...markers.map((m) => m.position)]
-      if (points.length > 1) {
-        const bounds = new k.maps.LatLngBounds()
-        points.forEach((p) => bounds.extend(new k.maps.LatLng(p.lat, p.lng)))
-        map.setBounds(bounds, 40, 40, 40, 40)
-      }
-    }
-
     return () => {
       overlays.forEach((o) => o.setMap(null))
       polyline?.setMap(null)
     }
-  }, [status, markers, path, fitBounds])
+  }, [status, markers, path])
+
+  // 범위 맞춤 — 경로나 마커 구성(id)이 바뀔 때만. 차량 마커가 움직일 때마다 화면이 튀지 않게 한다.
+  const fitKey = fitBounds ? `${JSON.stringify(path ?? [])}|${markers.map((m) => m.id).join(',')}` : ''
+  useEffect(() => {
+    const map = mapRef.current
+    const k = window.kakao
+    if (status !== 'ready' || !map || !k || !fitKey) return
+    const points = [...(path ?? []), ...markers.map((m) => m.position)]
+    if (points.length < 2) return
+    const bounds = new k.maps.LatLngBounds()
+    points.forEach((p) => bounds.extend(new k.maps.LatLng(p.lat, p.lng)))
+    map.setBounds(bounds, 40, 40, 40, 40)
+    // fitKey 가 바뀔 때만 실행 (markers/path 의 최신 값은 그 시점 값을 사용)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, fitKey])
 
   return (
     <div className={clsx(styles.root, className)} role="region" aria-roledescription="지도" aria-label={label}>
