@@ -21,9 +21,12 @@ export type DriveStatus = 'idle' | 'ready' | 'driving' | 'paused'
 type DriveState = {
   status: DriveStatus
   driveName: string
+  /** 출발지 — null 이면 '내 위치'(현재 GPS 위치) */
+  origin: Destination | null
   destination: Destination | null
   startDrive: (params: { name: string; destination?: Destination | null }) => void
   renameDrive: (name: string) => void
+  setOrigin: (origin: Destination | null) => void
   setDestination: (destination: Destination) => void
   pause: () => void
   resume: () => void
@@ -35,6 +38,7 @@ const normalizeName = (name: string) => name.trim() || DEFAULT_DRIVE_NAME
 export const useDriveStore = create<DriveState>((set) => ({
   status: 'idle',
   driveName: DEFAULT_DRIVE_NAME,
+  origin: null,
   destination: null,
 
   startDrive: ({ name, destination = null }) =>
@@ -42,11 +46,13 @@ export const useDriveStore = create<DriveState>((set) => ({
 
   renameDrive: (name) => set({ driveName: normalizeName(name) }),
 
+  setOrigin: (origin) => set({ origin }),
+
   setDestination: (destination) => set({ destination, status: 'driving' }),
 
   pause: () => set((s) => (s.status === 'driving' ? { status: 'paused' } : s)),
 
   resume: () => set((s) => (s.status === 'paused' ? { status: 'driving' } : s)),
 
-  endDrive: () => set({ status: 'idle', driveName: DEFAULT_DRIVE_NAME, destination: null }),
+  endDrive: () => set({ status: 'idle', driveName: DEFAULT_DRIVE_NAME, origin: null, destination: null }),
 }))

@@ -45,4 +45,14 @@ describe('driveStore', () => {
     expect(s.status).toBe('idle')
     expect(s.destination).toBeNull()
   })
+
+  it('출발지는 기본 내 위치(null)이고, 장소로 바꿀 수 있으며 종료 시 초기화된다', () => {
+    const st = useDriveStore.getState()
+    st.startDrive({ name: 'a' })
+    expect(useDriveStore.getState().origin).toBeNull()
+    useDriveStore.getState().setOrigin(destination)
+    expect(useDriveStore.getState().origin).toEqual(destination)
+    useDriveStore.getState().endDrive()
+    expect(useDriveStore.getState().origin).toBeNull()
+  })
 })
