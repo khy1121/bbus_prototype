@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { act, screen, waitFor } from '@testing-library/react'
 import { useDriveStore } from '@/stores/driveStore'
 import { useDriveSessionStore } from '../stores/driveSessionStore'
@@ -84,5 +85,21 @@ describe('DrivePage (01 / 04 / 16)', () => {
     await act(async () => {})
     await user.click(screen.getByRole('tab', { name: '휴게소 스탬프' }))
     expect(screen.getByRole('heading', { name: '휴게소 스탬프' })).toBeInTheDocument()
+  })
+
+  it('출발지를 장소로 정했으면 현재 위치를 묻지 않는다 (불필요한 위치 권한 팝업 방지)', async () => {
+    const { locate } = await import('@/lib/location')
+    const { resetLocationCache } = await import('../api')
+    resetLocationCache()
+    vi.mocked(locate).mockClear()
+    vi.mocked(locate).mockRejectedValue(new Error('denied'))
+    useDriveStore.getState().startDrive({ name: 'a', destination })
+    useDriveStore.getState().setOrigin({ id: 'banpo', name: '서울 반포 한강공원', address: '', position: { lat: 37.51, lng: 126.99 } })
+    renderDrive()
+    await waitFor(() => expect(useDriveSessionStore.getState().route).not.toBeNull())
+    expect(locate).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog', { name: '위치 권한이 필요해요' })).not.toBeInTheDocument()
+    vi.mocked(locate).mockReset()
+    vi.mocked(locate).mockResolvedValue({ lat: 37.4837, lng: 127.0324 })
   })
 })

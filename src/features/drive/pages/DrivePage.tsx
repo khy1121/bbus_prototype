@@ -38,13 +38,20 @@ function useSheetHeights(): Record<SnapPoint, number> {
   return useMemo(() => ({ collapsed: 132, half: Math.round(vh * 0.32), full: Math.round(vh * 0.86) }), [vh])
 }
 
-function imageMarker(src: string, size: number, label?: string) {
+/**
+ * 지도 마커 이미지. 크기를 고정해 두어야 이미지가 로드되기 전(높이 0)에 앵커가 어긋났다가 튀는 일이 없다.
+ * 원본은 2~3배 해상도라 확대해도 선명하다.
+ */
+function imageMarker(src: string, width: number, height: number, label?: string) {
   return () => {
     const el = document.createElement('img')
     el.src = src
     el.alt = label ?? ''
-    el.style.width = `${size}px`
-    el.style.height = 'auto'
+    el.width = width
+    el.height = height
+    el.draggable = false
+    el.decoding = 'async'
+    el.style.display = 'block'
     return el
   }
 }
@@ -71,6 +78,9 @@ export function DrivePage() {
 
   useEffect(() => {
     getRestStops().then(setRestStops)
+    // 현재 위치는 목적지 전(내 위치 표시)이거나 출발지가 '내 위치'일 때만 필요
+    const { origin: o, destination: d } = useDriveStore.getState()
+    if (d && o) return
     getCurrentLocation()
       .then((loc) => setMyPosition(loc.position))
       .catch(() => setLocationError(true))
@@ -104,17 +114,17 @@ export function DrivePage() {
 
   const markers = useMemo(() => {
     if (!route || !destination)
-      return [{ id: 'me', position: myPosition, render: imageMarker(images.carMarker, 53, '현재 위치') }]
+      return [{ id: 'me', position: myPosition, render: imageMarker(images.carMarker, 53, 49, '현재 위치') }]
     return [
-      { id: 'start', position: route.path[0], render: imageMarker(icons.markerStart, 20) },
+      { id: 'start', position: route.path[0], render: imageMarker(icons.markerStart, 20, 23) },
       ...route.restStops.map((stop) => ({
         id: stop.id,
         position: stop.position,
-        render: imageMarker(images.restStop, 53, stop.name),
+        render: imageMarker(images.restStop, 53, 53, stop.name),
         onClick: () => setSelectedStop(stop),
       })),
-      { id: 'dest', position: destination.position, render: imageMarker(images.heartMarker, 54, destination.name) },
-      { id: 'car', position: carPosition, render: imageMarker(images.carMarker, 53, '현재 위치'), zIndex: 10 },
+      { id: 'dest', position: destination.position, render: imageMarker(images.heartMarker, 54, 53, destination.name) },
+      { id: 'car', position: carPosition, render: imageMarker(images.carMarker, 53, 49, '현재 위치'), zIndex: 10 },
     ]
   }, [route, destination, myPosition, carPosition])
 

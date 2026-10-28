@@ -35,6 +35,11 @@ export type CurrentLocation = { position: LatLng; address: string }
 let lastLocation: { at: number; value: Promise<CurrentLocation> } | null = null
 const LOCATION_TTL_MS = 30_000
 
+/** 위치 캐시 비우기 (권한을 새로 허용했을 때·테스트) */
+export function resetLocationCache() {
+  lastLocation = null
+}
+
 /**
  * 현재 위치 = 브라우저 GPS 좌표 + 카카오 역지오코딩 지역명('서초구 서초동').
  * 여러 화면에서 연달아 부르므로 30초 동안은 같은 결과를 재사용한다.
