@@ -1,0 +1,83 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 15px 16px 14px 17px;
+  border-radius: 20px;
+  background: linear-gradient(149deg, rgba(255, 170, 149, 0.25) 0.5%, rgba(255, 29, 70, 0.25) 113.8%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.album {
+  width: 66px;
+  height: 66px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chip {
+  @include focus-ring;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 21px;
+  padding: 0 10px;
+  border-radius: $radius-full;
+  background: var(--color-coral-stroke);
+  color: var(--color-coral-background);
+  @include typo('caption-s-bold');
+  letter-spacing: 0;
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 5px;
+}
+
+.texts {
+  min-width: 0;
+}
+
+.title {
+  @include typo('body-m-bold');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.artist {
+  @include typo('caption');
+  color: var(--color-gray-600);
+  @include ellipsis;
+}
+
+.progress {
+  height: 8px;
+  border-radius: $radius-full;
+  background: var(--color-divider);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffe7e1, #ff705a);
+  transition: width 1s linear;
+}
