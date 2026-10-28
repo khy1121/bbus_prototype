@@ -1,0 +1,109 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.illust {
+  width: 66px;
+  height: 66px;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.title {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('body-s');
+  color: var(--color-gray-400);
+}
+
+.locate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field {
+  position: relative;
+  width: 100%;
+}
+
+.label {
+  @include visually-hidden;
+}
+
+.input {
+  width: 100%;
+  height: 47px;
+  padding: 0 14px;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  background: var(--color-white);
+  caret-color: var(--color-coral);
+  @include typo('body-m-medium');
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  &:focus {
+    border-color: var(--color-coral-2);
+  }
+}
+
+.options {
+  margin-top: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--color-gray-100);
+  border-radius: 10px;
+  background: var(--color-white);
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  @include typo('body-s');
+  color: var(--color-black);
+  cursor: pointer;
+
+  & + & {
+    border-top: 1px solid var(--color-divider);
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--color-coral-3);
+    outline: none;
+  }
+}
+
+.optionHighway {
+  @include typo('caption');
+  color: var(--color-gray-400);
+  white-space: nowrap;
+}
+
+.empty {
+  margin-top: 6px;
+  @include typo('caption');
+  color: var(--color-gray-400);
+}
+
+.submit {
+  margin-top: 4px;
+}
