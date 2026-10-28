@@ -2,6 +2,11 @@
 declare namespace kakao.maps {
   function load(callback: () => void): void
 
+  namespace event {
+    function addListener(target: unknown, type: string, handler: () => void): void
+    function removeListener(target: unknown, type: string, handler: () => void): void
+  }
+
   class LatLng {
     constructor(lat: number, lng: number)
     getLat(): number

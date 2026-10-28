@@ -29,6 +29,8 @@ type KakaoMapProps = {
   fitBounds?: boolean
   /** false 면 드래그/줌 불가 (읽기 전용 미리보기) */
   interactive?: boolean
+  /** 사용자가 지도를 끌어 움직이기 시작할 때 */
+  onUserDrag?: () => void
   /** 지도 위에 띄울 UI */
   children?: ReactNode
   className?: string
@@ -51,6 +53,7 @@ export function KakaoMap({
   path,
   fitBounds = false,
   interactive = true,
+  onUserDrag,
   children,
   className,
 }: KakaoMapProps) {
@@ -84,12 +87,33 @@ export function KakaoMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // 중심 이동 — 확대 레벨은 건드리지 않는다 (운행 중 사용자가 확대해도 유지)
   useEffect(() => {
     const map = mapRef.current
     if (status !== 'ready' || !map || !window.kakao) return
     map.setCenter(new window.kakao.maps.LatLng(center.lat, center.lng))
+  }, [status, center.lat, center.lng])
+
+  // 레벨은 prop 이 바뀔 때만 적용
+  useEffect(() => {
+    const map = mapRef.current
+    if (status !== 'ready' || !map) return
     map.setLevel(level)
-  }, [status, center.lat, center.lng, level])
+  }, [status, level])
+
+  // 사용자가 지도를 끌기 시작하면 알림 (차량 따라가기 해제용)
+  const onUserDragRef = useRef(onUserDrag)
+  useEffect(() => {
+    onUserDragRef.current = onUserDrag
+  }, [onUserDrag])
+  useEffect(() => {
+    const map = mapRef.current
+    const k = window.kakao
+    if (status !== 'ready' || !map || !k) return
+    const handler = () => onUserDragRef.current?.()
+    k.maps.event.addListener(map, 'dragstart', handler)
+    return () => k.maps.event.removeListener(map, 'dragstart', handler)
+  }, [status])
 
   // 마커 + 폴리라인
   useEffect(() => {

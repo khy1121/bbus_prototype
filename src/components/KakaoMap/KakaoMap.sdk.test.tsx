@@ -3,7 +3,13 @@ import { vi } from 'vitest'
 import { KakaoMap, type MapMarker } from './KakaoMap'
 
 // ---- 카카오맵 SDK 가짜 구현 (호출 기록용) ----
-const calls = vi.hoisted(() => ({ setBounds: 0, polylines: [] as { path: unknown[]; map: unknown }[] }))
+const calls = vi.hoisted(() => ({
+  setBounds: 0,
+  setLevel: 0,
+  setCenter: 0,
+  polylines: [] as { path: unknown[]; map: unknown }[],
+  listeners: {} as Record<string, () => void>,
+}))
 
 const fakeKakao = vi.hoisted(() => {
   class LatLng {
@@ -18,8 +24,12 @@ const fakeKakao = vi.hoisted(() => {
     extend() {}
   }
   class Map {
-    setCenter() {}
-    setLevel() {}
+    setCenter() {
+      calls.setCenter += 1
+    }
+    setLevel() {
+      calls.setLevel += 1
+    }
     setBounds() {
       calls.setBounds += 1
     }
@@ -36,7 +46,15 @@ const fakeKakao = vi.hoisted(() => {
       calls.polylines.push({ path: this.opts.path, map })
     }
   }
-  return { maps: { LatLng, LatLngBounds, Map, CustomOverlay, Polyline, load: (cb: () => void) => cb() } }
+  const event = {
+    addListener: (_target: unknown, type: string, handler: () => void) => {
+      calls.listeners[type] = handler
+    },
+    removeListener: (_target: unknown, type: string) => {
+      delete calls.listeners[type]
+    },
+  }
+  return { maps: { LatLng, LatLngBounds, Map, CustomOverlay, Polyline, event, load: (cb: () => void) => cb() } }
 })
 
 vi.mock('@/lib/kakao/loadKakaoMaps', () => ({
@@ -56,7 +74,32 @@ const car = (lat: number): MapMarker => ({ id: 'car', position: { lat, lng: 127 
 describe('KakaoMap (SDK 연동)', () => {
   beforeEach(() => {
     calls.setBounds = 0
+    calls.setLevel = 0
+    calls.setCenter = 0
     calls.polylines = []
+    calls.listeners = {}
+  })
+
+  it('중심만 바뀌면 확대 레벨을 건드리지 않는다 — 운행 중 사용자가 확대한 상태 유지', async () => {
+    const { rerender } = render(<KakaoMap label="지도" center={path[0]} level={8} />)
+    await waitFor(() => expect(calls.setCenter).toBeGreaterThan(0))
+    const levelCalls = calls.setLevel
+    rerender(<KakaoMap label="지도" center={{ lat: 37.49, lng: 127.02 }} level={8} />)
+    rerender(<KakaoMap label="지도" center={{ lat: 37.5, lng: 127.01 }} level={8} />)
+    await waitFor(() => expect(calls.setCenter).toBeGreaterThanOrEqual(3))
+    expect(calls.setLevel).toBe(levelCalls)
+
+    // level prop 자체가 바뀔 때만 레벨 변경
+    rerender(<KakaoMap label="지도" center={{ lat: 37.5, lng: 127.01 }} level={5} />)
+    await waitFor(() => expect(calls.setLevel).toBe(levelCalls + 1))
+  })
+
+  it('사용자가 지도를 끌면 onUserDrag 를 호출한다', async () => {
+    const onUserDrag = vi.fn()
+    render(<KakaoMap label="지도" center={path[0]} onUserDrag={onUserDrag} />)
+    await waitFor(() => expect(calls.listeners.dragstart).toBeDefined())
+    calls.listeners.dragstart()
+    expect(onUserDrag).toHaveBeenCalled()
   })
 
   it('path 가 있으면 경로 폴리라인을 지도에 그린다', async () => {
