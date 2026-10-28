@@ -1,0 +1,61 @@
+.viewport {
+  position: absolute;
+  inset: 0;
+}
+
+// 사진 마커 54×71 — 카카오 커스텀 오버레이(yAnchor=1)가 하단 점을 좌표에 맞춘다
+.marker {
+  @include reset-button;
+  @include focus-ring;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 54px;
+  margin-bottom: -5px;
+  transition: transform $duration-fast ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.frame {
+  position: relative;
+  width: 54px;
+  height: 61px;
+}
+
+.frameImg {
+  position: absolute;
+  left: -20px;
+  top: -20px;
+  width: 94px;
+  height: 101px;
+  max-width: none;
+}
+
+.photo {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+
+  img {
+    position: absolute;
+    left: -20px;
+    top: -20px;
+    width: 50px;
+    height: 50px;
+    max-width: none;
+  }
+}
