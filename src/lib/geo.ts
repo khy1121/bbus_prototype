@@ -31,3 +31,12 @@ export function pointAtKm(path: LatLng[], km: number, acc: number[] = cumulative
   const b = path[i]
   return { lat: a.lat + (b.lat - a.lat) * t, lng: a.lng + (b.lng - a.lng) * t }
 }
+
+/** 경로에서 km 지점 이후만 (현재 지점 보간 포함). 끝까지 갔으면 빈 배열 */
+export function remainingPath(path: LatLng[], km: number, acc: number[] = cumulativeKm(path)): LatLng[] {
+  const total = acc[acc.length - 1] ?? 0
+  if (km <= 0) return path
+  if (km >= total) return []
+  const next = acc.findIndex((d) => d > km)
+  return [pointAtKm(path, km, acc), ...path.slice(next)]
+}

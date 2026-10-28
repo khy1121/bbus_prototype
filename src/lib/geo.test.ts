@@ -1,4 +1,4 @@
-import { cumulativeKm, haversineKm, pointAtKm } from './geo'
+import { cumulativeKm, haversineKm, pointAtKm, remainingPath } from './geo'
 
 // 경도 1도 ≈ 적도에서 111.19km
 const line = [
@@ -28,5 +28,21 @@ describe('geo', () => {
   it('pointAtKm: 범위를 벗어나면 양 끝점', () => {
     expect(pointAtKm(line, -5)).toEqual(line[0])
     expect(pointAtKm(line, 9999)).toEqual(line[2])
+  })
+})
+
+describe('remainingPath (지나온 길을 뺀 남은 경로)', () => {
+  it('현재 지점(보간)부터 끝까지', () => {
+    const rest = remainingPath(line, 222.39)
+    expect(rest[0].lng).toBeCloseTo(2, 2)
+    expect(rest.slice(1)).toEqual([line[2]])
+  })
+
+  it('출발 전이면 전체 경로', () => {
+    expect(remainingPath(line, 0)).toEqual(line)
+  })
+
+  it('도착했으면 빈 경로', () => {
+    expect(remainingPath(line, 9999)).toEqual([])
   })
 })
