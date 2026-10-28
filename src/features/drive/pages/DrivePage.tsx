@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ConfirmDialog, DraggableSheet, SegmentedControl, type SnapPoint } from '@/components'
 import { KakaoMap, type LatLng } from '@/components/KakaoMap/KakaoMap'
 import { DriveStartSheet } from '@/features/drive-start/DriveStartSheet'
+import { LocationPermissionDialog } from '@/features/permissions/LocationPermissionDialog'
 import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { cumulativeKm, pointAtKm } from '@/lib/geo'
 import { useDriveStore } from '@/stores/driveStore'
@@ -64,12 +65,15 @@ export function DrivePage() {
   const [exitOpen, setExitOpen] = useState(false)
   const [restStops, setRestStops] = useState<RestStop[]>([])
   const [selectedStop, setSelectedStop] = useState<RestStop | null>(null)
+  const [locationError, setLocationError] = useState(false)
   const [myPosition, setMyPosition] = useState({ lat: 37.4837, lng: 127.0324 })
   const heights = useSheetHeights()
 
   useEffect(() => {
     getRestStops().then(setRestStops)
-    getCurrentLocation().then((loc) => setMyPosition(loc.position))
+    getCurrentLocation()
+      .then((loc) => setMyPosition(loc.position))
+      .catch(() => setLocationError(true))
   }, [])
 
   const hasRoute = Boolean(destination && route)
@@ -92,7 +96,10 @@ export function DrivePage() {
   const stopFollowing = () => setPinnedCenter((prev) => prev ?? carPosition)
   const handleLocate = () => {
     setPinnedCenter(null)
-    if (!hasRoute) getCurrentLocation().then((l) => setMyPosition(l.position))
+    if (!hasRoute)
+      getCurrentLocation({ fresh: true })
+        .then((l) => setMyPosition(l.position))
+        .catch(() => setLocationError(true))
   }
 
   const markers = useMemo(() => {
@@ -211,6 +218,16 @@ export function DrivePage() {
         }}
         onConfirm={handleEnd}
         onClose={() => setExitOpen(false)}
+      />
+      <LocationPermissionDialog
+        open={locationError}
+        onClose={() => setLocationError(false)}
+        onOpenSettings={() => {
+          setLocationError(false)
+          getCurrentLocation({ fresh: true })
+            .then((l) => setMyPosition(l.position))
+            .catch(() => setLocationError(true))
+        }}
       />
       <RestStopModal restStop={selectedStop} acquired={Boolean(selectedStop && stamps[selectedStop.id])} onClose={() => setSelectedStop(null)} />
     </div>
