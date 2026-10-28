@@ -2,6 +2,7 @@
 import { fileURLToPath, URL } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import svgr from 'vite-plugin-svgr'
 import { handleDirectionsRequest } from './src/lib/kakao/directions.js'
 
@@ -27,7 +28,50 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    plugins: [react(), svgr(), directionsDevApi(env.KAKAO_REST_API_KEY)],
+    plugins: [
+      react(),
+      svgr(),
+      directionsDevApi(env.KAKAO_REST_API_KEY),
+      VitePWA({
+        registerType: 'autoUpdate',
+        injectRegister: false, // main.tsx 에서 직접 등록
+        includeAssets: ['favicon.svg', 'icons/apple-touch-icon-180x180.png'],
+        manifest: {
+          name: '붕붕어스',
+          short_name: '붕붕어스',
+          description: '연인과 함께하는 드라이브 기록 앱',
+          lang: 'ko',
+          start_url: '/',
+          scope: '/',
+          display: 'standalone',
+          orientation: 'portrait',
+          theme_color: '#FFFBFB',
+          background_color: '#FFFBFB',
+          icons: [
+            { src: '/icons/pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/icons/pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+            { src: '/icons/maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          ],
+        },
+        workbox: {
+          // SPA: 오프라인/새로고침 시 index.html — 단, 서버 함수(/api)는 제외
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/api\//],
+          // 설치 시에는 앱 셸(코드·스타일·아이콘)만 미리 받고, 사진은 처음 볼 때 캐시
+          globPatterns: ['**/*.{js,css,html,svg}', 'icons/*.png'],
+          runtimeCaching: [
+            {
+              urlPattern: ({ request, sameOrigin }) => sameOrigin && request.destination === 'image',
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'images',
+                expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+          ],
+        },
+      }),
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
