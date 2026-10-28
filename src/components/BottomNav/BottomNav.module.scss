@@ -1,0 +1,92 @@
+// Figma 10:6889 — 흰 바 + 가운데가 솟은 원형 범프 + 그라데이션 FAB
+$bar-height: 76px;
+$bump-size: 82px;
+
+.nav {
+  position: relative;
+  width: 100%;
+  padding-bottom: var(--safe-bottom);
+  background: var(--color-white);
+  filter: drop-shadow(0 -2px 8px rgba(0, 0, 0, 0.06));
+
+  // 가운데 범프
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -26px;
+    width: $bump-size;
+    height: $bump-size;
+    border-radius: 50%;
+    background: var(--color-white);
+    transform: translateX(-50%);
+  }
+}
+
+.bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr) 92px repeat(2, 1fr);
+  height: $bar-height;
+}
+
+.centerSlot {
+  pointer-events: none;
+}
+
+.tab {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  padding-top: 18px;
+  color: var(--color-black);
+  @include typo('body-m');
+}
+
+.active {
+  @include typo('body-m-medium');
+}
+
+.iconBox {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 24px;
+}
+
+.drive {
+  @include focus-ring;
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transform: translateX(-50%);
+  border-radius: 33px;
+}
+
+.fab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  // Figma: 그라데이션 FFE7E1 → FF705A (nav-fab-active.svg 와 동일)
+  background: linear-gradient(155deg, #ffe7e1 -30%, #ff705a 100%);
+  transition: transform $duration-fast ease;
+
+  .drive:active & {
+    transform: scale(0.95);
+  }
+}
+
+.driveLabel {
+  @include typo('body-s');
+  color: var(--color-coral);
+}
