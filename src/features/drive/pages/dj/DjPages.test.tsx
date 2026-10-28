@@ -49,7 +49,7 @@ describe('DJ 플레이리스트 (07 → 08 → 09)', () => {
     await user.click(screen.getByRole('button', { name: /맑음/ }))
     await user.click(screen.getByRole('button', { name: /AI 플레이리스트 만들기/ }))
     expect(router.state.location.pathname).toBe('/drive/dj/loading')
-    expect(screen.getByText('선택한 키워드 분석')).toBeInTheDocument()
+    expect(screen.getByText('선택한 키워드 분석 중...')).toBeInTheDocument()
     await act(async () => {
       await vi.advanceTimersByTimeAsync(5000)
     })

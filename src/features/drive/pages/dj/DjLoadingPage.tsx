@@ -9,7 +9,12 @@ import { usePlayerStore } from '../../stores/playerStore'
 import type { PlaylistPreference } from '../../types'
 import styles from './Dj.module.scss'
 
-const STEPS = ['선택한 키워드 분석', '음악 서비스에서 곡 찾는 중', '도착 시간에 맞춰 구성 중']
+/** 단계별 문구: [진행 중, 완료] (Figma 10:9757) */
+const STEPS: [string, string][] = [
+  ['선택한 키워드 분석 중...', '선택한 키워드 분석 완료'],
+  ['음악 서비스에서 곡 찾는 중...', '음악 서비스에서 곡 찾기 완료'],
+  ['도착 시간에 맞춰 구성 중...', '도착 시간에 맞춰 구성 완료'],
+]
 const STEP_MS = 1200
 /** 생성 제한 시간 — 넘으면 시간 초과 안내 */
 export const DJ_GENERATE_TIMEOUT_MS = 30_000
@@ -94,23 +99,31 @@ export function DjLoadingPage() {
       }
     >
       <div className={styles.loading}>
-        <div className={styles.pulse} aria-hidden>
-          <span className={styles.wave} />
-          <span className={styles.wave} />
-          <span className={styles.wave} />
+        {/* 진행 링 + 음파 (Figma 10:9743) */}
+        <div className={styles.disc} aria-hidden>
+          <img src={images.djLoadingDisc} alt="" />
+          <span className={styles.bar} />
+          <span className={styles.bar} />
+          <span className={styles.bar} />
+          <span className={styles.bar} />
         </div>
-        <p className={styles.loadingSub}>잠시만 기다려주세요...</p>
-        <p className={styles.loadingTitle} role="status">
-          우리에게 꼭 맞는 <em>감성 플레이리스트</em>가<br />
-          만들어지고 있어요!
-        </p>
+        <div className={styles.loadingTexts}>
+          <p className={styles.loadingSub}>잠시만 기다려주세요..</p>
+          <p className={styles.loadingTitle} role="status">
+            우리에게 꼭 맞는 <em>맞춤 플레이리스트</em>가<br />
+            만들어지고 있어요!
+          </p>
+        </div>
         <ol className={styles.steps}>
-          {STEPS.map((label, i) => (
-            <li key={label} className={clsx(styles.step, i < step && styles.done, i === step && styles.active)}>
-              <span className={styles.stepIcon} aria-hidden>
-                {i < step ? <img src={images.check} alt="" /> : <span className={styles.spinner} />}
-              </span>
-              {label}
+          {STEPS.map(([pending, done], i) => (
+            <li key={pending} className={clsx(styles.step, i > step && styles.upcoming)}>
+              <img
+                className={clsx(styles.stepIcon, i === step && styles.spinning)}
+                src={i < step ? images.djStepDone : images.djStepPending}
+                alt=""
+                aria-hidden
+              />
+              {i < step ? done : pending}
             </li>
           ))}
         </ol>

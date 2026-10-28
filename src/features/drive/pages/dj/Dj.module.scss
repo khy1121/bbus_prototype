@@ -1,3 +1,5 @@
+@use '../../styles/drive' as *;
+
 // ---------- 07 취향 선택 ----------
 .sections {
   display: flex;
@@ -38,69 +40,74 @@
   height: 20px;
 }
 
-// ---------- 08 생성 중 ----------
+// ---------- 08 생성 중 (Figma 10:9742) ----------
 .loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 40px;
+  gap: 28px;
+  padding-top: 64px; // 헤더 아래 88px (본문 위 여백 24px 포함)
   text-align: center;
 }
 
-.pulse {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 92px;
-  height: 92px;
-  margin-bottom: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ff8a7a 0 45%, rgba(248, 131, 121, 0.25) 46% 100%);
-  box-shadow: 0 0 0 12px rgba(248, 131, 121, 0.12);
-  animation: pulse 1.6s ease-in-out infinite;
+.disc {
+  position: relative;
+  width: 151px;
+  height: 151px;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
-.wave {
-  width: 4px;
-  height: 18px;
-  border-radius: $radius-full;
-  background: var(--color-white);
+// 음파 막대 4개 — Figma 좌표 그대로 (left, top, height)
+$bars: (48px, 65px, 21px), (64px, 56px, 40px), (78px, 61px, 29px), (94px, 69px, 13px);
+
+.bar {
+  position: absolute;
+  width: 9px;
+  border-radius: 20px;
+  background: var(--color-coral-background);
   animation: wave 1s ease-in-out infinite;
 
-  &:nth-child(2) {
-    height: 26px;
-    animation-delay: 0.15s;
+  @for $i from 1 through length($bars) {
+    $b: nth($bars, $i);
+    &:nth-of-type(#{$i}) {
+      left: nth($b, 1);
+      top: nth($b, 2);
+      height: nth($b, 3);
+      animation-delay: #{($i - 1) * 0.15}s;
+    }
   }
+}
 
-  &:nth-child(3) {
-    animation-delay: 0.3s;
-  }
+.loadingTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .loadingSub {
-  @include typo('caption');
-  color: var(--color-gray-400);
+  @include typo('body-m-medium');
+  color: var(--color-gray-600);
 }
 
 .loadingTitle {
-  margin-top: 6px;
-  @include typo('body-m-bold');
+  @include typo('body-l-bold');
   color: var(--color-black);
 
   em {
     font-style: normal;
-    color: var(--color-coral);
+    @include gradient-text-2;
   }
 }
 
 .steps {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  margin-top: 36px;
-  padding: 0 20px;
+  gap: 15px;
+  width: 214px;
   text-align: left;
 }
 
@@ -108,46 +115,29 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  @include typo('body-s');
+  @include typo('body-m-medium');
+  color: var(--color-gray-900);
+  white-space: nowrap;
+}
+
+.upcoming {
   color: var(--color-gray-400);
 }
 
-.done {
-  color: var(--color-gray-800);
-}
-
-.active {
-  color: var(--color-black);
-}
-
 .stepIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-
-  img {
-    width: 22px;
-    height: 22px;
-  }
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
 }
 
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--color-coral-2);
-  border-top-color: var(--color-coral);
-  border-radius: 50%;
-
-  .active & {
-    animation: spin 0.8s linear infinite;
-  }
+.spinning {
+  animation: spin 1s linear infinite;
 }
 
-@keyframes pulse {
-  50% {
-    box-shadow: 0 0 0 20px rgba(248, 131, 121, 0.08);
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .spinning {
+    animation: none;
   }
 }
 
@@ -168,7 +158,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 35px;
+  margin-bottom: 25px; // Figma 35px — 첫 줄 위 여백 10px 은 .trackRow 높이에 포함
 }
 
 .resultTitleRow {
@@ -198,7 +188,7 @@
 }
 
 .resultMeta {
-  margin-bottom: 12px;
+  margin-bottom: 12px; // + .resultHead gap 8 = 키워드까지 20px (Figma 10:9777)
   @include typo('body-m-regular');
   color: var(--color-gray-600);
   white-space: pre;
@@ -238,7 +228,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  height: 66px;
+  height: 68px; // 곡 48 + 위아래 10 (Figma 10:9791)
   background: var(--color-coral-background);
   transition: transform $duration-base $ease-out;
   touch-action: pan-y;
@@ -255,7 +245,7 @@
 }
 
 .trackNo {
-  width: 20px;
+  width: 25px; // 번호 → 앨범 37px (Figma)
   @include typo('body-m-regular-bold');
   color: var(--color-gray-800);
 }

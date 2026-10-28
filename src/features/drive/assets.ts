@@ -3,6 +3,9 @@ import type { Direction } from '@/lib/heading'
 import route from './assets/icons/route.svg'
 import locate from './assets/icons/locate.svg'
 import exit from './assets/icons/exit.svg'
+import djLoadingDisc from './assets/dj/loading-disc.svg'
+import djStepDone from './assets/dj/step-done.svg'
+import djStepPending from './assets/dj/step-pending.svg'
 import stop from './assets/icons/stop.svg'
 import menu from './assets/icons/menu.svg'
 import hamburger from './assets/icons/hamburger.svg'
@@ -97,6 +100,9 @@ export const icons = {
 }
 
 export const images = {
+  djLoadingDisc,
+  djStepDone,
+  djStepPending,
   arrowTurn,
   avatarDriver,
   avatarPassenger,
