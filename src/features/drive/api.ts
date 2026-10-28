@@ -1,0 +1,122 @@
+import type { PlaceSummary } from '@/components'
+import type { LatLng } from '@/components/KakaoMap/KakaoMap'
+import {
+  BALANCE_QUESTIONS,
+  djScript,
+  MEMORY_QUESTIONS,
+  MOCK_PLACES,
+  MOCK_POPULAR_ROUTES,
+  MOCK_REST_STOPS,
+  MOCK_TRACKS,
+  MY_ADDRESS,
+  MY_POSITION,
+  QUIZ_QUESTIONS,
+  RANDOM_STORIES,
+} from './mocks'
+import type {
+  BalanceQuestion,
+  DriveRoute,
+  MemoryQuestion,
+  Place,
+  Playlist,
+  PlaylistPreference,
+  QuizQuestion,
+  RadioStory,
+  RestStop,
+} from './types'
+
+/*
+ * 드라이브 모드 API 레이어.
+ * 현재는 목업을 돌려준다. 실제 연동 시 함수 시그니처는 유지하고 내부만 교체한다.
+ */
+
+// TODO(backend): GPS + 카카오 로컬 API(coord2address) 로 현재 위치/주소 조회
+export async function getCurrentLocation(): Promise<{ position: LatLng; address: string }> {
+  return { position: MY_POSITION, address: MY_ADDRESS }
+}
+
+// TODO(backend): 카카오 로컬 API 키워드 검색 (거리순 정렬)
+export async function searchPlaces(query: string): Promise<Place[]> {
+  const q = query.trim()
+  if (!q) return []
+  return MOCK_PLACES.filter((p) => p.name.includes(q)).sort((a, b) => a.distanceKm - b.distanceKm)
+}
+
+export async function getPlace(id: string): Promise<Place | undefined> {
+  return MOCK_PLACES.find((p) => p.id === id)
+}
+
+// TODO(backend): 인기 드라이브 경로 API
+export async function getPopularRoutes(): Promise<PlaceSummary[]> {
+  return MOCK_POPULAR_ROUTES
+}
+
+// TODO(backend): 카카오 모빌리티 길찾기 API + 경로 내 휴게소 조회
+export async function getRoute(destination: { position: LatLng }): Promise<DriveRoute> {
+  const from = MY_POSITION
+  const to = destination.position
+  const steps = 8
+  const path = Array.from({ length: steps + 1 }, (_, i) => {
+    const t = i / steps
+    // 약간 휘어진 경로
+    return { lat: from.lat + (to.lat - from.lat) * t + Math.sin(t * Math.PI) * 0.02, lng: from.lng + (to.lng - from.lng) * t }
+  })
+  const distanceKm = Math.max(haversine(from, to) * 1.3, 1)
+  const restStops = MOCK_REST_STOPS.slice(0, 3).map((r, i) => ({ ...r, position: path[2 + i * 2] }))
+  return { path, restStops, distanceKm, durationMin: Math.round((distanceKm / 45) * 60) }
+}
+
+// TODO(backend): 휴게소/대표메뉴 데이터 (한국도로공사 공공데이터 등)
+export async function getRestStops(): Promise<RestStop[]> {
+  return MOCK_REST_STOPS
+}
+
+// TODO(backend): GPS 기준 가장 가까운 휴게소 조회
+export async function findNearestRestStop(): Promise<RestStop> {
+  return MOCK_REST_STOPS[0]
+}
+
+// TODO(backend): LLM + 음악 서비스 API 로 플레이리스트 생성 (예상 도착 시간 기반 곡 수)
+export async function generatePlaylist(pref: PlaylistPreference, targetSeconds = 3600): Promise<Playlist> {
+  const keywords = [...pref.moods, ...(pref.weather ? [pref.weather] : []), ...pref.genres]
+  const tracks = []
+  let total = 0
+  for (let i = 0; total < targetSeconds - 5 * 60; i++) {
+    const t = MOCK_TRACKS[i % MOCK_TRACKS.length]
+    tracks.push({ ...t, id: `${t.id}-${i}` })
+    total += t.duration
+  }
+  return { id: `pl-${Date.now()}`, title: '노을처럼 따뜻한 우리', keywords, tracks }
+}
+
+// TODO(backend): LLM 으로 사연을 라디오 대본으로 변환 + TTS 생성
+export async function sendStory(text: string): Promise<RadioStory> {
+  return { id: `story-${Date.now()}`, text, script: djScript(text), createdAt: new Date().toISOString().slice(0, 10) }
+}
+
+export async function getRandomStory(exclude?: string): Promise<RadioStory> {
+  const pool = RANDOM_STORIES.filter((s) => s !== exclude)
+  const text = pool[Math.floor(Math.random() * pool.length)]
+  return sendStory(text)
+}
+
+// TODO(backend): LLM 게임 문제 생성
+export async function getBalanceQuestions(): Promise<BalanceQuestion[]> {
+  return BALANCE_QUESTIONS
+}
+export async function getQuizQuestions(): Promise<QuizQuestion[]> {
+  return QUIZ_QUESTIONS
+}
+export async function getMemoryQuestions(): Promise<MemoryQuestion[]> {
+  return MEMORY_QUESTIONS
+}
+
+function haversine(a: LatLng, b: LatLng): number {
+  const R = 6371
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(x))
+}
