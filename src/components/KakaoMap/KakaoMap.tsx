@@ -56,7 +56,9 @@ export function KakaoMap({
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<kakao.maps.Map | null>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'unavailable'>(getKakaoMapKey() ? 'loading' : 'unavailable')
+  const [status, setStatus] = useState<'loading' | 'ready' | 'unavailable'>(
+    getKakaoMapKey() ? 'loading' : 'unavailable',
+  )
 
   // 지도 생성
   useEffect(() => {
@@ -112,26 +114,40 @@ export function KakaoMap({
       return overlay
     })
 
-    const polyline =
-      path && path.length > 1
-        ? new k.maps.Polyline({
-            path: path.map((p) => new k.maps.LatLng(p.lat, p.lng)),
-            strokeWeight: 6,
-            strokeColor: colors.coral,
-            strokeOpacity: 0.9,
+    // 내비 스타일 경로: 흰 테두리(아래) + 코랄 선(위)
+    const routeLatLngs = path && path.length > 1 ? path.map((p) => new k.maps.LatLng(p.lat, p.lng)) : null
+    const polylines = routeLatLngs
+      ? [
+          new k.maps.Polyline({
+            path: routeLatLngs,
+            strokeWeight: 11,
+            strokeColor: colors.white,
+            strokeOpacity: 1,
             strokeStyle: 'solid',
-          })
-        : null
-    polyline?.setMap(map)
+          }),
+          new k.maps.Polyline({
+            path: routeLatLngs,
+            strokeWeight: 7,
+            strokeColor: colors.coral,
+            strokeOpacity: 1,
+            strokeStyle: 'solid',
+          }),
+        ]
+      : []
+    polylines.forEach((line) => line.setMap(map))
 
     return () => {
       overlays.forEach((o) => o.setMap(null))
-      polyline?.setMap(null)
+      polylines.forEach((line) => line.setMap(null))
     }
   }, [status, markers, path])
 
   // 범위 맞춤 — 경로나 마커 구성(id)이 바뀔 때만. 차량 마커가 움직일 때마다 화면이 튀지 않게 한다.
-  const fitKey = fitBounds ? `${JSON.stringify(path ?? [])}|${markers.map((m) => m.id).join(',')}` : ''
+  // 실제 경로는 좌표가 수천 개라 전체 직렬화 대신 길이 + 양 끝점으로 식별
+  const pathKey = path?.length
+    ? `${path.length}:${path[0].lat},${path[0].lng}:${path[path.length - 1].lat},${path[path.length - 1].lng}`
+    : ''
+  const fitKey = fitBounds ? `${pathKey}|${markers.map((m) => m.id).join(',')}` : ''
   useEffect(() => {
     const map = mapRef.current
     const k = window.kakao
@@ -149,9 +165,7 @@ export function KakaoMap({
     <div className={clsx(styles.root, className)} role="region" aria-roledescription="지도" aria-label={label}>
       {status === 'unavailable' ? (
         <div className={styles.placeholder} data-testid="kakao-map-placeholder">
-          <span className={styles.placeholderText}>
-            지도를 표시하려면 .env 에 VITE_KAKAO_MAP_KEY 를 설정하세요.
-          </span>
+          <span className={styles.placeholderText}>지도를 표시하려면 .env 에 VITE_KAKAO_MAP_KEY 를 설정하세요.</span>
         </div>
       ) : (
         <div ref={containerRef} className={styles.map} />
