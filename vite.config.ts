@@ -54,6 +54,11 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          // 새 배포의 서비스 워커가 기다리지 않고 바로 활성화되어 열린 페이지를 넘겨받는다.
+          // (없으면 예전 코드가 계속 실행되며, 서버에서 지워진 예전 이미지를 요청해 깨져 보인다)
+          skipWaiting: true,
+          clientsClaim: true,
+          cleanupOutdatedCaches: true,
           // SPA: 오프라인/새로고침 시 index.html — 단, 서버 함수(/api)는 제외
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [/^\/api\//],
