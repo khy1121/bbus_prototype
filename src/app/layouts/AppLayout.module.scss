@@ -1,0 +1,32 @@
+.app {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--color-coral-background);
+}
+
+.main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.tab {
+  min-height: 100dvh;
+}
+
+.tabContent {
+  // 하단 네비 높이만큼 여유 (모바일)
+  padding-bottom: calc(110px + var(--safe-bottom));
+
+  @include desktop {
+    padding-bottom: 0;
+  }
+}
+
+.bottomNav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: $z-nav;
+}
