@@ -153,6 +153,7 @@
   background: linear-gradient(72.89deg, rgba(0, 0, 0, 0.24) 10.87%, rgba(0, 0, 0, 0.12) 57.44%, rgba(0, 0, 0, 0.24) 89.39%);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   transform: translate(-50%, -50%);
   @include typo('body-s-medium');
   color: var(--color-white);
