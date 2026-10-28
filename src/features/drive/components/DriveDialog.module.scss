@@ -1,0 +1,29 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 25px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.dialog {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  padding: 25px 19px 22px;
+  border-radius: 30px;
+  background: var(--color-coral-background);
+  outline: none;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1;
+}
