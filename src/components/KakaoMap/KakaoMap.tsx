@@ -131,6 +131,16 @@ export function KakaoMap({
     map.setCenter(new window.kakao.maps.LatLng(center.lat, center.lng))
   }, [status, center.lat, center.lng])
 
+  // 컨테이너 크기가 바뀌면(화면 회전·창 크기 변경) 지도 타일을 다시 맞춘다 — 안 하면 빈 영역이 남는다
+  useEffect(() => {
+    const map = mapRef.current
+    const el = containerRef.current
+    if (status !== 'ready' || !map || !el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => map.relayout())
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [status])
+
   // 레벨은 prop 이 바뀔 때만 적용
   useEffect(() => {
     const map = mapRef.current
