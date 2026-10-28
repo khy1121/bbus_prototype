@@ -33,7 +33,14 @@ import searchDark from './assets/icons/search-dark.svg'
 import arrowTurn from './assets/arrow-turn.webp'
 import avatarDriver from './assets/avatar-driver.webp'
 import avatarPassenger from './assets/avatar-passenger.webp'
-import carMarker from './assets/car-marker.webp'
+import carE from './assets/car/car-e.webp'
+import carN from './assets/car/car-n.webp'
+import carNE from './assets/car/car-ne.webp'
+import carNW from './assets/car/car-nw.webp'
+import carS from './assets/car/car-s.webp'
+import carSE from './assets/car/car-se.webp'
+import carSW from './assets/car/car-sw.webp'
+import carW from './assets/car/car-w.webp'
 import chalkboard from './assets/chalkboard.webp'
 import check from './assets/check.webp'
 import djHero from './assets/dj-hero.webp'
@@ -93,7 +100,6 @@ export const images = {
   arrowTurn,
   avatarDriver,
   avatarPassenger,
-  carMarker,
   chalkboard,
   check,
   djHero,
@@ -116,16 +122,19 @@ export const images = {
 }
 
 /**
- * 진행 방향별 차량 마커 (8방향). 방향별 일러스트가 준비되면 각 방향의 import 만 바꾸면 된다.
- * TODO(asset): 방향별 이미지 — 현재는 모든 방향이 기본 차량 이미지
+ * 진행 방향별 차량 마커 (8방향, 위에서 비스듬히 본 시점). AI(GPT 이미지)로 생성 — Figma '붕붕어스 차량 방향 에셋 (AI 생성)'.
+ * 모든 방향이 같은 캔버스에 바퀴 기준 바닥 정렬되어 있어 방향이 바뀌어도 마커 위치가 흔들리지 않는다.
  */
 export const carByDirection: Record<Direction, string> = {
-  N: carMarker,
-  NE: carMarker,
-  E: carMarker,
-  SE: carMarker,
-  S: carMarker,
-  SW: carMarker,
-  W: carMarker,
-  NW: carMarker,
+  N: carN,
+  NE: carNE,
+  E: carE,
+  SE: carSE,
+  S: carS,
+  SW: carSW,
+  W: carW,
+  NW: carNW,
 }
+
+/** 차량 마커 표시 크기 (원본 180×156 의 1/3) */
+export const CAR_MARKER_SIZE = { width: 60, height: 52 } as const
