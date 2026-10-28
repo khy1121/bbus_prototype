@@ -16,6 +16,8 @@
   height: 84px;
   border-radius: 10px;
   overflow: hidden;
+  // iOS 사파리: 블러 처리된 지도가 둥근 모서리 밖으로 삐져나오지 않게
+  clip-path: inset(0 round 10px);
 
   @include desktop {
     height: 200px;
