@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Chip, PlaceCard, type PlaceSummary } from '@/components'
+import { PlaceCard, type PlaceSummary } from '@/components'
 import refreshIcon from '../assets/refresh.svg'
-import { CATEGORIES } from '../mocks'
-import { CATEGORY_ICONS, categorySprite } from '../sprites'
 import type { CategoryId } from '../types'
-import { SpriteImage } from './SpriteImage'
+import { CategoryChips } from './CategoryChips'
 import styles from './CurationSection.module.scss'
 
 type CurationSectionProps = {
@@ -55,18 +53,12 @@ export function CurationSection({
         <p className={styles.description}>지금 기분에 맞는 드라이브를 찾아보세요.</p>
       </div>
 
-      <div className={styles.chips} role="group" aria-label="카테고리">
-        {CATEGORIES.map((c) => (
-          <Chip
-            key={c.id}
-            selected={c.id === category}
-            icon={<SpriteImage src={categorySprite} crop={CATEGORY_ICONS[c.id]} />}
-            onClick={() => c.id !== category && onCategoryChange(c.id)}
-          >
-            {c.label}
-          </Chip>
-        ))}
-      </div>
+      <CategoryChips
+        className={styles.chips}
+        label="카테고리"
+        selected={category}
+        onSelect={(c) => c !== category && onCategoryChange(c)}
+      />
 
       <ul ref={listRef} className={styles.list} onScroll={handleScroll} aria-busy={loading}>
         {places.map((place) => (
