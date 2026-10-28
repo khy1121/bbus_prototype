@@ -1,0 +1,87 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  padding-top: calc(4px + env(safe-area-inset-top, 0px));
+  background: var(--color-coral-background);
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 25px 24px 25px;
+}
+
+.banners {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 -4px; // 배너는 좌우 21px (Figma)
+}
+
+.recommendDesktop {
+  display: none;
+}
+
+// Figma 10:6363 — 10px 디바이더
+.divider {
+  height: 10px;
+  background: var(--color-divider);
+}
+
+.curation {
+  padding-top: 17px;
+}
+
+.recommendMobile {
+  padding: 20px 21px 0;
+}
+
+// ---------- 태블릿: 모바일 레이아웃을 넓힌 형태 ----------
+@include tablet-up {
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+// ---------- 데스크톱 (옵션 A): 넓은 콘텐츠 + 그리드 ----------
+@include desktop {
+  .page {
+    max-width: 1120px;
+    padding: 40px 48px 64px;
+  }
+
+  .top {
+    padding: 0 0 32px;
+    gap: 24px;
+  }
+
+  .banners {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    margin: 0;
+  }
+
+  .driveBanner {
+    min-height: 240px;
+  }
+
+  .recommendDesktop {
+    display: flex;
+    height: 100%;
+    min-height: 240px;
+  }
+
+  .divider {
+    height: 1px;
+  }
+
+  .curation {
+    padding-top: 32px;
+  }
+
+  .recommendMobile {
+    display: none;
+  }
+}
