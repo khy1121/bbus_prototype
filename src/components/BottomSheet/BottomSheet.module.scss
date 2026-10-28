@@ -1,6 +1,8 @@
 .overlay {
   position: fixed;
   inset: 0;
+  // iOS 키보드가 올라오면 그 위까지만 덮는다 (useKeyboardInset)
+  bottom: var(--keyboard-inset, 0px);
   z-index: $z-modal;
   display: flex;
   align-items: flex-end;

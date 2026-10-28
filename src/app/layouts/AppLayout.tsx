@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { BottomNav } from '@/components'
 import { DriveStartSheet } from '@/features/drive-start/DriveStartSheet'
+import { useKeyboardInset } from '@/hooks/useKeyboardInset'
 import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { useDriveStore } from '@/stores/driveStore'
 import { useUiStore } from '@/stores/uiStore'
@@ -17,6 +18,7 @@ import styles from './AppLayout.module.scss'
 export function AppLayout() {
   const isDesktop = useIsDesktop()
   const navigate = useNavigate()
+  useKeyboardInset()
   const carName = useUserStore((s) => s.carName)
   const startDrive = useDriveStore((s) => s.startDrive)
   const { driveStart, openDriveStart, closeDriveStart } = useUiStore()
