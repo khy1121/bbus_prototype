@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { icons, images } from '../assets'
 import { usePlayerStore } from '../stores/playerStore'
@@ -13,7 +14,7 @@ const GAMES = [
 ]
 
 /** 하단 시트 '콘텐츠' 탭 — 함께 즐길 콘텐츠 (Figma 10:16223) */
-export function ContentPanel() {
+export const ContentPanel = memo(function ContentPanel() {
   // 전체 재생/단일 재생을 시작한 뒤에는 DJ 카드가 재생 카드로 바뀐다
   const showPlayer = usePlayerStore((s) => s.started && Boolean(s.playlist?.tracks.length))
   const radioPlaying = useRadioStore((s) => s.isPlaying)
@@ -74,4 +75,4 @@ export function ContentPanel() {
       </ul>
     </section>
   )
-}
+})

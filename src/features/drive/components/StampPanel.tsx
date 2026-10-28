@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Button } from '@/components'
 import { icons, images } from '../assets'
 import { useDriveDataStore } from '../stores/driveDataStore'
@@ -33,7 +33,7 @@ const SLOTS: [number, number][] = [
 type StampPanelProps = { restStops: RestStop[] }
 
 /** 06 휴게소 스탬프 탭 (Figma 10:10346) */
-export function StampPanel({ restStops }: StampPanelProps) {
+export const StampPanel = memo(function StampPanel({ restStops }: StampPanelProps) {
   const stamps = useDriveDataStore((s) => s.stamps)
   const acquireStamp = useDriveDataStore((s) => s.acquireStamp)
   const [selected, setSelected] = useState<RestStop | null>(null)
@@ -110,4 +110,4 @@ export function StampPanel({ restStops }: StampPanelProps) {
       />
     </section>
   )
-}
+})
