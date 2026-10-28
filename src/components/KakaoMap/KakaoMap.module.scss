@@ -6,6 +6,13 @@
   background: #e8efe4;
 }
 
+// 조작 가능한 지도: 터치 제스처(핀치·더블탭·드래그)는 지도만 처리 — 브라우저 페이지 확대/스크롤로 새지 않게
+.interactive {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .map {
   position: absolute;
   inset: 0;

@@ -58,10 +58,22 @@ export function KakaoMap({
   className,
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<kakao.maps.Map | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'unavailable'>(
     getKakaoMapKey() ? 'loading' : 'unavailable',
   )
+
+  // iOS 사파리/인앱 브라우저: 지도 위 핀치를 페이지 확대(gesture 이벤트)가 가로채지 않게 막는다.
+  // 지도 영역에만 적용 — 다른 화면에서는 사용자가 페이지를 확대할 수 있어야 한다(접근성).
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root || !interactive) return
+    const prevent = (e: Event) => e.preventDefault()
+    const types = ['gesturestart', 'gesturechange', 'gestureend']
+    types.forEach((t) => root.addEventListener(t, prevent, { passive: false }))
+    return () => types.forEach((t) => root.removeEventListener(t, prevent))
+  }, [interactive])
 
   // 지도 생성
   useEffect(() => {
@@ -186,7 +198,13 @@ export function KakaoMap({
   }, [status, fitKey])
 
   return (
-    <div className={clsx(styles.root, className)} role="region" aria-roledescription="지도" aria-label={label}>
+    <div
+      ref={rootRef}
+      className={clsx(styles.root, interactive && styles.interactive, className)}
+      role="region"
+      aria-roledescription="지도"
+      aria-label={label}
+    >
       {status === 'unavailable' ? (
         <div className={styles.placeholder} data-testid="kakao-map-placeholder">
           <span className={styles.placeholderText}>지도를 표시하려면 .env 에 VITE_KAKAO_MAP_KEY 를 설정하세요.</span>
