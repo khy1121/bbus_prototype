@@ -33,9 +33,15 @@ describe('카카오 로컬 휴게소 검색', () => {
     expect(parsePointsParam(Array.from({ length: 61 }, () => '37,127').join('|'))).toBeNull()
   })
 
-  it('휴게소만 남긴다 (휴게소 안 식당·주유소·졸음쉼터 제외)', () => {
+  it('고속도로 휴게소만 남긴다 (휴게소 안 매장·주유소·졸음쉼터·일반 쉼터 제외)', () => {
     expect(isRestStopPlace(doc('1', '기흥휴게소 부산방향', 0, 0))).toBe(true)
-    expect(isRestStopPlace(doc('2', '덕평자연휴게소', 0, 0, '교통,수송 > 휴게소'))).toBe(true)
+    expect(isRestStopPlace(doc('2', '덕평자연휴게소', 0, 0))).toBe(true)
+    expect(isRestStopPlace(doc('6', '행담도휴게소(양방향)', 0, 0))).toBe(true)
+    // 같은 '고속도로휴게소' 분류의 휴게소 안 매장
+    expect(isRestStopPlace(doc('7', '천안명물호두과자 입장거봉포도휴게소서울방향점', 0, 0))).toBe(false)
+    // 고속도로가 아닌 일반 휴게소·택시 쉼터
+    expect(isRestStopPlace(doc('8', '뚝방휴게소', 0, 0, '교통,수송 > 휴게소'))).toBe(false)
+    expect(isRestStopPlace(doc('9', '기흥택시쉼터', 0, 0, '교통,수송 > 휴게소'))).toBe(false)
     expect(isRestStopPlace(doc('3', '기흥휴게소 투썸플레이스', 0, 0, '음식점 > 카페'))).toBe(false)
     expect(isRestStopPlace(doc('4', '기흥휴게소 주유소', 0, 0, '교통,수송 > 자동차 > 주유,가스충전 > 주유소'))).toBe(false)
     expect(isRestStopPlace(doc('5', '오산졸음쉼터', 0, 0, '교통,수송 > 휴게소 > 졸음쉼터'))).toBe(false)

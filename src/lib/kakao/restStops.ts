@@ -57,12 +57,16 @@ export function parsePointsParam(value: string | null): LatLng[] | null {
   return points
 }
 
-/** 휴게소 자체만 — 휴게소 안의 식당·카페·주유소, 졸음쉼터는 제외 */
+/**
+ * 고속도로 휴게소 자체만 — 내비처럼 고속도로 휴게소만 안내한다.
+ * 같은 분류여도 휴게소 안 매장('천안명물호두과자 입장거봉포도휴게소서울방향점'), 택시 쉼터·국도변 식당, 졸음쉼터는 제외.
+ * 이름은 'OO휴게소' 또는 'OO휴게소 부산방향' / 'OO휴게소(서울방향)' 형태만 허용.
+ */
+const REST_STOP_NAME = /^\S*휴게소(\s*\(?[가-힣]+방향\)?)?$/
+
 export function isRestStopPlace(place: Pick<KakaoPlace, 'place_name' | 'category_name'>): boolean {
-  const category = place.category_name ?? ''
-  if (/졸음쉼터|주유|충전/.test(category) || /졸음쉼터/.test(place.place_name)) return false
-  const leaf = category.split('>').pop()?.trim() ?? ''
-  return category.includes('휴게소') && leaf.includes('휴게소')
+  const leaf = (place.category_name ?? '').split('>').pop()?.trim() ?? ''
+  return leaf === '고속도로휴게소' && REST_STOP_NAME.test(place.place_name.trim())
 }
 
 /** 도로명 주소에서 고속도로 이름 ('경기 용인시 기흥구 경부고속도로 409' → '경부고속도로') */
