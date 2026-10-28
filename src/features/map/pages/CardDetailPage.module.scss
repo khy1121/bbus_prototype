@@ -1,0 +1,133 @@
+$glass: linear-gradient(78.16deg, rgba(255, 255, 255, 0.65) 1.2%, rgba(255, 255, 255, 0.39) 34.32%, rgba(255, 255, 255, 0.65) 85.2%);
+$glass-pressed: linear-gradient(78.16deg, rgba(202, 202, 202, 0.65) 1.2%, rgba(202, 202, 202, 0.39) 34.32%, rgba(202, 202, 202, 0.65) 85.2%);
+
+.page {
+  min-height: 100dvh;
+  padding-bottom: calc(40px + var(--safe-bottom));
+  background: var(--color-coral-background);
+}
+
+// 10:15495 ~ 10:15497
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: env(safe-area-inset-top, 0px) 25px 0;
+  background: var(--color-coral-background);
+  box-sizing: content-box;
+}
+
+.date {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  @include typo('body-l');
+  color: var(--color-black);
+  white-space: nowrap;
+}
+
+.trash {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0.5px solid var(--color-white);
+  border-radius: 18px;
+  background: $glass;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+
+  &:active {
+    border-color: #b4b4b4;
+    background: $glass-pressed;
+  }
+
+  img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 15px 25px 0;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  > :nth-child(2) {
+    margin-top: 6px;
+  }
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0 7px;
+}
+
+.title {
+  @include typo('title-s-bold');
+  color: var(--color-black);
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  @include typo('body-s-medium');
+  color: var(--color-coral-pressed2);
+
+  img {
+    width: 12px;
+    height: 15px;
+  }
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// ---------- Desktop: 2단 (정보 | 사진·문구) ----------
+@include desktop {
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'summary photos'
+      'messages photos';
+    align-items: start;
+    gap: 32px 40px;
+    max-width: 960px;
+    padding: 24px 40px 0;
+  }
+
+  .summary {
+    grid-area: summary;
+  }
+
+  .photos {
+    grid-area: photos;
+    position: sticky;
+    top: 80px;
+  }
+
+  .messages {
+    grid-area: messages;
+  }
+}
