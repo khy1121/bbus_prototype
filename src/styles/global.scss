@@ -76,6 +76,15 @@ textarea {
   color: inherit;
 }
 
+// iOS 는 16px 미만 입력창에 포커스하면 화면을 자동 확대하고 되돌리지 않는다 → iOS 에서만 16px 보장
+@supports (-webkit-touch-callout: none) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em) !important;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
