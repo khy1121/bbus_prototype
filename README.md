@@ -52,3 +52,7 @@ src/
 
 - Pretendard (CDN)
 - Figma 의 김정철 명조는 무료 대체 폰트 Nanum Myeongjo(Google Fonts) 로 적용.
+
+## 개선 과제
+
+남은 작업과 개선 아이디어는 [docs/IMPROVEMENTS.md](docs/IMPROVEMENTS.md) 에 정리되어 있다.
