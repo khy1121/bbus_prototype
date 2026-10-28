@@ -1,0 +1,83 @@
+.page {
+  min-height: 100dvh;
+  background: var(--color-coral-background);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 7px 25px 40px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupTitle {
+  @include typo('body-m');
+  color: var(--color-gray-600);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+// Figma 10:6303 — 78px, radius 5
+.item {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  min-height: 78px;
+  padding: 14px 14px 14px 11px;
+  border-radius: 5px;
+  background: var(--color-coral-background);
+  text-align: left;
+  transition: background-color $duration-fast ease;
+
+  &:active {
+    background: var(--color-coral-3);
+  }
+}
+
+.unread {
+  background: var(--color-divider);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  @include typo('body-m-medium');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.time {
+  flex-shrink: 0;
+  @include typo('caption');
+  color: var(--color-gray-400);
+}
+
+.description {
+  @include typo('body-s');
+  color: var(--color-gray-600);
+}
+
+@include desktop {
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-top: 24px;
+  }
+}
