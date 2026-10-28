@@ -1,0 +1,12 @@
+.sprite {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    max-width: none;
+    pointer-events: none;
+  }
+}
