@@ -1,11 +1,7 @@
 import type { RouteObject } from 'react-router-dom'
 import { PlaceholderPage } from '@/app/PlaceholderPage'
-import { HomePage } from './pages/HomePage'
 import { NotificationsPage } from './pages/NotificationsPage'
 import { PlaceDetailPage } from './pages/PlaceDetailPage'
-
-/** 하단 네비가 붙는 홈 탭 */
-export const homeTabRoutes: RouteObject[] = [{ path: '/', element: <HomePage /> }]
 
 /** 전체 화면: 알림, 장소 상세 */
 export const homeRoutes: RouteObject[] = [
