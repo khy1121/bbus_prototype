@@ -1,0 +1,65 @@
+.chip {
+  @include focus-ring;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: var(--color-black);
+  transition:
+    background-color $duration-fast ease,
+    border-color $duration-fast ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 홈 카테고리 칩 (Figma 10:7050)
+.category {
+  height: 36px;
+  gap: 8px;
+  padding: 6px 12px 7px 11px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--color-white);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+  @include typo('body-m-regular');
+
+  .icon {
+    width: 21px;
+    height: 18px;
+  }
+
+  &.selected {
+    background: var(--color-coral-2);
+    border-color: var(--color-coral-stroke);
+    @include typo('body-m-regular-bold');
+  }
+}
+
+// DJ 키워드 칩 (Figma 10:14202)
+.keyword {
+  height: 28px;
+  gap: 4px;
+  padding: 3px 12px 4px 11px;
+  border-radius: $radius-full;
+  border: 1px solid var(--color-coral-2);
+  background: var(--color-coral-background);
+  @include typo('body-s');
+
+  .icon {
+    @include typo('caption');
+  }
+
+  &.selected {
+    background: var(--color-coral-stroke);
+    border-color: var(--color-coral-pressed2);
+  }
+}
