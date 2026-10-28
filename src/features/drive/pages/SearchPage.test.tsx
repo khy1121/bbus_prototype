@@ -71,4 +71,40 @@ describe('SearchPage (02 / 03)', () => {
     await user.click(screen.getByRole('button', { name: '출발지와 도착지 바꾸기' }))
     expect(screen.getByTestId('route-from')).toHaveTextContent('시흥 오이도')
   })
+
+  it('도착지가 없어도 출발/도착 바꾸기가 동작한다', async () => {
+    const { user } = renderDrive('/drive/search')
+    await screen.findByText('(서초구 서초동)')
+    await user.click(screen.getByRole('button', { name: '출발지와 도착지 바꾸기' }))
+    expect(screen.getByTestId('route-to')).toHaveTextContent('내 위치')
+    expect(screen.getByTestId('route-from')).not.toHaveTextContent('내 위치')
+  })
+
+  it('출발지를 눌러 직접 검색해 바꾸고, 이어서 도착지를 고르면 그 출발지로 경로 미리보기 → 경로 설정', async () => {
+    const { user, router } = renderDrive('/drive/search')
+    await screen.findByText('(서초구 서초동)')
+    await user.click(screen.getByRole('button', { name: /출발지: 내 위치/ }))
+    await user.type(screen.getByRole('searchbox', { name: '출발지' }), '반포{Enter}')
+    await user.click(await screen.findByRole('button', { name: /서울 반포 한강공원/ }))
+    expect(screen.getByTestId('route-from')).toHaveTextContent('서울 반포 한강공원')
+
+    // 다음은 도착지 입력
+    await user.type(screen.getByRole('searchbox', { name: '도착지' }), '오이도{Enter}')
+    await user.click(await screen.findByRole('button', { name: /시흥 오이도/ }))
+    expect(router.state.location.pathname).toBe('/drive/route/oido')
+    expect(router.state.location.search).toContain('from=banpo')
+    expect(await screen.findByText('서울 반포 한강공원')).toBeInTheDocument()
+
+    await user.click(await screen.findByRole('button', { name: '경로 설정하기' }))
+    expect(useDriveStore.getState().origin?.name).toBe('서울 반포 한강공원')
+    expect(useDriveStore.getState().destination?.name).toBe('시흥 오이도')
+  })
+
+  it('출발지 입력 중 "내 위치로 설정" 으로 되돌릴 수 있다', async () => {
+    const { user } = renderDrive('/drive/search')
+    await screen.findByText('(서초구 서초동)')
+    await user.click(screen.getByRole('button', { name: /출발지: 내 위치/ }))
+    await user.click(screen.getByRole('button', { name: '내 위치로 설정' }))
+    expect(screen.getByTestId('route-from')).toHaveTextContent('내 위치')
+  })
 })

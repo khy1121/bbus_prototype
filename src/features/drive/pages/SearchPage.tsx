@@ -1,7 +1,8 @@
 import { Fragment, useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { EmptyState, PlaceCard, type PlaceSummary } from '@/components'
-import { useDriveStore } from '@/stores/driveStore'
+import { LocationPermissionDialog } from '@/features/permissions/LocationPermissionDialog'
+import { useDriveStore, type Destination } from '@/stores/driveStore'
 import { getCurrentLocation, getPopularRoutes, searchPlaces } from '../api'
 import { icons, images } from '../assets'
 import { useDriveDataStore } from '../stores/driveDataStore'
@@ -9,22 +10,47 @@ import type { Place } from '../types'
 import { splitHighlight } from '../utils/format'
 import styles from './SearchPage.module.scss'
 
+/** 출발지/도착지 칸의 값: 내 위치 · 장소 · 비어 있음 */
+type Endpoint = { kind: 'me' } | { kind: 'place'; place: Place } | { kind: 'empty' }
+type Field = 'from' | 'to'
+
+const ME: Endpoint = { kind: 'me' }
+const EMPTY: Endpoint = { kind: 'empty' }
+const endpointId = (e: Endpoint) => (e.kind === 'place' ? e.place.id : 'me')
+const toEndpoint = (d: Destination | null, fallback: Endpoint): Endpoint =>
+  d ? { kind: 'place', place: { ...d, distanceKm: 0 } } : fallback
+const asPlace = (p: Place | PlaceSummary): Place =>
+  'position' in p ? p : { id: p.id, name: p.name, address: p.region, distanceKm: 0, position: { lat: 0, lng: 0 } }
+
 /** 02 장소 검색 / 03 장소 검색 결과 (Figma 10:16282, 10:16617) */
 export function SearchPage() {
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
+  const origin = useDriveStore((s) => s.origin)
   const destination = useDriveStore((s) => s.destination)
   const { recentSearches, addRecentSearch, removeRecentSearch } = useDriveDataStore()
 
   const [address, setAddress] = useState('')
-  const [swapped, setSwapped] = useState(false)
+  const [locationError, setLocationError] = useState(false)
+  const [from, setFrom] = useState<Endpoint>(() => toEndpoint(origin, ME))
+  const [to, setTo] = useState<Endpoint>(() => toEndpoint(destination, EMPTY))
+  /** 지금 입력 중인 칸 */
+  const [active, setActive] = useState<Field>('to')
   const [input, setInput] = useState(query || destination?.name || '')
   const [results, setResults] = useState<Place[] | null>(null)
   const [popular, setPopular] = useState<PlaceSummary[]>([])
 
+  const loadLocation = () =>
+    getCurrentLocation({ fresh: true })
+      .then((loc) => {
+        setAddress(loc.address)
+        setLocationError(false)
+      })
+      .catch(() => setLocationError(true))
+
   useEffect(() => {
-    getCurrentLocation().then((loc) => setAddress(loc.address))
+    loadLocation()
     getPopularRoutes().then(setPopular)
   }, [])
 
@@ -53,41 +79,108 @@ export function SearchPage() {
     search(input)
   }
 
-  const myLocation = (
-    <span className={styles.myLocation}>
-      내 위치 {address && <span className={styles.address}>{`(${address})`}</span>}
-    </span>
-  )
+  /** 입력 칸 전환 — 해당 칸을 입력 상태로 */
+  const editField = (field: Field, current: Endpoint = field === 'from' ? from : to) => {
+    setActive(field)
+    setInput(current.kind === 'place' ? current.place.name : '')
+    setParams({})
+  }
+
+  /** 양쪽이 정해지면 경로 미리보기로 */
+  const openPreview = (nextFrom: Endpoint, nextTo: Endpoint) => {
+    if (nextTo.kind === 'empty' || nextFrom.kind === 'empty') return false
+    if (nextFrom.kind === 'me' && nextTo.kind === 'me') return false
+    navigate(`/drive/route/${endpointId(nextTo)}?from=${endpointId(nextFrom)}`)
+    return true
+  }
+
+  /** 장소 선택 → 입력 중인 칸에 넣는다 */
+  const choose = (place: Place | PlaceSummary, field: Field = active) => {
+    const picked: Endpoint = { kind: 'place', place: asPlace(place) }
+    const nextFrom = field === 'from' ? picked : from
+    const nextTo = field === 'to' ? picked : to
+    setFrom(nextFrom)
+    setTo(nextTo)
+    if (openPreview(nextFrom, nextTo)) return
+    // 출발지를 골랐으면 이어서 도착지 입력
+    const next: Field = field === 'from' ? 'to' : 'from'
+    editField(next, next === 'from' ? nextFrom : nextTo)
+  }
+
+  /** 입력 중인 칸을 '내 위치'로 */
+  const setMine = (field: Field) => {
+    if (field === 'from') setFrom(ME)
+    else setTo(ME)
+    const next: Field = field === 'from' ? 'to' : 'from'
+    editField(next, next === 'from' ? from : to)
+  }
+
+  /** 출발·도착 맞바꾸기 — 비어 있는 칸이 있으면 그 칸을 입력 상태로 */
+  const swap = () => {
+    const nextFrom = to
+    const nextTo = from
+    setFrom(nextFrom)
+    setTo(nextTo)
+    const next: Field = nextFrom.kind === 'empty' ? 'from' : 'to'
+    editField(next, next === 'from' ? nextFrom : nextTo)
+  }
+
+  const endpointText = (e: Endpoint) =>
+    e.kind === 'me' ? `내 위치${address ? ` (${address})` : ''}` : e.kind === 'place' ? e.place.name : '비어 있음'
+
+  const renderValue = (e: Endpoint, field: Field) => {
+    if (e.kind === 'me')
+      return (
+        <span className={styles.myLocation}>
+          내 위치 {address && <span className={styles.address}>{`(${address})`}</span>}
+        </span>
+      )
+    if (e.kind === 'place') return <span className={styles.myLocation}>{e.place.name}</span>
+    return <span className={styles.placeholder}>{field === 'from' ? '출발지를 입력해주세요.' : '도착지를 입력해주세요.'}</span>
+  }
+
+  const renderField = (field: Field) => {
+    const value = field === 'from' ? from : to
+    const name = field === 'from' ? '출발지' : '도착지'
+    if (active === field) {
+      return (
+        <form role="search" className={styles.fieldForm} onSubmit={handleSubmit}>
+          <label htmlFor={`drive-${field}`} className={styles.hidden}>
+            {name}
+          </label>
+          <input
+            id={`drive-${field}`}
+            type="search"
+            className={styles.toInput}
+            placeholder={`${name}를 입력해주세요.`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            autoFocus
+          />
+        </form>
+      )
+    }
+    return (
+      <button type="button" className={styles.fieldButton} aria-label={`${name}: ${endpointText(value)}`} onClick={() => editField(field)}>
+        {renderValue(value, field)}
+      </button>
+    )
+  }
 
   return (
     <div className={styles.page}>
       <div className={styles.routeBox}>
         <img className={styles.routeDots} src={icons.routeDots} alt="" aria-hidden />
-        <button type="button" className={styles.swap} aria-label="출발지와 도착지 바꾸기" onClick={() => setSwapped((v) => !v)}>
+        <button type="button" className={styles.swap} aria-label="출발지와 도착지 바꾸기" onClick={swap}>
           <img src={icons.swap} alt="" aria-hidden />
         </button>
         <div className={styles.fields}>
           <div className={styles.from} data-testid="route-from">
-            {swapped && destination ? <span className={styles.myLocation}>{destination.name}</span> : myLocation}
+            {renderField('from')}
           </div>
-          <form role="search" className={styles.toForm} onSubmit={handleSubmit}>
-            <label htmlFor="drive-destination" className={styles.hidden}>
-              도착지
-            </label>
-            {swapped && destination ? (
-              <div className={styles.toStatic}>{myLocation}</div>
-            ) : (
-              <input
-                id="drive-destination"
-                type="search"
-                className={styles.toInput}
-                placeholder="도착지를 입력해주세요."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                autoFocus
-              />
-            )}
-          </form>
+          <div className={styles.toForm} data-testid="route-to">
+            {renderField('to')}
+          </div>
         </div>
         {/* TODO: 경유지 추가 결과 화면 미정 (명세 '해당 결과 화면 아직 X') */}
         <button type="button" className={styles.add} aria-label="경유지 추가">
@@ -97,6 +190,14 @@ export function SearchPage() {
           <img src={icons.closeLarge} alt="" aria-hidden />
         </button>
       </div>
+
+      {/* 출발지 입력 중에는 바로 '내 위치'로 되돌릴 수 있게 (디자인 없음 → 추가) */}
+      {active === 'from' && (
+        <button type="button" className={styles.useMine} onClick={() => setMine(active)}>
+          <img src={icons.recentPin} alt="" aria-hidden />
+          내 위치로 설정
+        </button>
+      )}
 
       {results === null ? (
         <>
@@ -126,7 +227,7 @@ export function SearchPage() {
             </h2>
             <div className={styles.popularList}>
               {popular.map((place) => (
-                <PlaceCard key={place.id} place={place} onClick={(id) => navigate(`/drive/route/${id}`)} />
+                <PlaceCard key={place.id} place={place} onClick={() => choose(place, 'to')} />
               ))}
             </div>
           </section>
@@ -137,7 +238,7 @@ export function SearchPage() {
         <ul className={styles.results} aria-label="검색 결과">
           {results.map((place) => (
             <li key={place.id}>
-              <button type="button" className={styles.result} onClick={() => navigate(`/drive/route/${place.id}`)}>
+              <button type="button" className={styles.result} onClick={() => choose(place)}>
                 <img className={styles.resultIcon} src={images.arrowTurn} alt="" aria-hidden />
                 <span className={styles.resultBody}>
                   <span className={styles.resultName}>
@@ -156,6 +257,12 @@ export function SearchPage() {
           ))}
         </ul>
       )}
+
+      <LocationPermissionDialog
+        open={locationError && (from.kind === 'me' || to.kind === 'me')}
+        onClose={() => setLocationError(false)}
+        onOpenSettings={loadLocation}
+      />
     </div>
   )
 }

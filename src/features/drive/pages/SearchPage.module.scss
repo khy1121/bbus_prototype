@@ -70,6 +70,36 @@
   padding-top: 10px;
 }
 
+.fieldForm {
+  display: flex;
+  min-height: 24px;
+}
+
+.fieldButton {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 24px;
+  text-align: left;
+}
+
+.placeholder {
+  @include typo('body-s');
+  color: var(--color-gray-400);
+}
+
+// 입력 중인 칸을 '내 위치'로 되돌리기 (디자인 없음 → 최근 검색 항목 톤으로 추가)
+.useMine {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 25px 0;
+  @include typo('body-m-medium');
+  color: var(--color-coral-pressed);
+}
+
 .toInput {
   width: 100%;
   border: 0;
