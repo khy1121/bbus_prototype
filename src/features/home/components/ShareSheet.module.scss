@@ -1,0 +1,99 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-right: 40px;
+}
+
+.thumb {
+  width: 80px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  object-fit: cover;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.placeTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.name {
+  @include typo('body-l-bold');
+  color: var(--color-black);
+  @include ellipsis;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  @include typo('body-m-regular');
+  color: var(--color-gray-600);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.blockTitle {
+  @include typo('body-m-medium');
+  color: var(--color-black);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 30px;
+  padding: 0 0 0 12px;
+  border-radius: 5px;
+  background: var(--color-divider);
+}
+
+.url {
+  @include typo('caption');
+  color: var(--color-gray-600);
+  @include ellipsis;
+}
+
+.copy {
+  @include focus-ring;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.channels {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 10px 0 9px;
+}
+
+.channel {
+  @include focus-ring;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  width: 60px;
+  @include typo('body-s');
+  color: var(--color-black);
+
+  img {
+    width: 57px;
+    height: 57px;
+    border-radius: 50%;
+  }
+}
