@@ -1,0 +1,161 @@
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #000;
+
+  @include desktop {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    height: 100dvh;
+  }
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0 0 12px 12px;
+
+  @include desktop {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// 10:15652 블러 레이어
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 95px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), transparent);
+  }
+}
+
+// 10:15669
+.editBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.editActions {
+  display: flex;
+  gap: 6px;
+}
+
+.round {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: $radius-full;
+  background: rgba(0, 0, 0, 0.4);
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.card {
+  position: relative;
+}
+
+// 10:15656
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 10px calc(16px + var(--safe-bottom));
+
+  @include desktop {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+.targets {
+  display: flex;
+  gap: 8px;
+}
+
+.target {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 152px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: $radius-full;
+  background: rgba(255, 255, 255, 0.2);
+  @include typo('body-s');
+  color: var(--color-white);
+
+  span {
+    flex: 1;
+    text-align: center;
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.avatar {
+  border: 1.5px solid var(--color-white);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.next {
+  @include focus-ring;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: $radius-full;
+  background: var(--color-white);
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
