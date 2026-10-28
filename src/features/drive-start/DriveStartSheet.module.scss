@@ -1,0 +1,24 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 23px;
+  padding-top: 0;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.title {
+  @include typo('title-m-bold');
+  color: var(--color-black);
+}
+
+.description {
+  @include typo('body-m');
+  color: var(--color-gray-600);
+}
