@@ -1,0 +1,55 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+
+.date {
+  @include typo('body-m-medium');
+  // Figma 의 그라데이션(10:15754)은 텍스트 대부분이 FFE7E1 로 거의 흰색이라 코랄 계열 그라데이션으로 가독성 보정
+  background: linear-gradient(180deg, #ffaa95 0%, #ff705a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bell {
+  @include focus-ring;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--color-white);
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.05));
+}
+
+.dot {
+  position: absolute;
+  top: 0;
+  right: 1px;
+}
+
+.greeting {
+  display: flex;
+  flex-direction: column;
+}
+
+.hello {
+  @include typo('body-l');
+  color: var(--color-black);
+}
+
+.title {
+  @include typo('title-s-bold');
+  color: var(--color-black);
+}
