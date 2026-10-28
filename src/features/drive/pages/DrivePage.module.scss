@@ -100,7 +100,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
+
+  // Figma 는 한 줄(nowrap). 좁은 화면에서는 줄바꿈 대신 말줄임
+  span {
+    min-width: 0;
+    @include ellipsis;
+  }
   min-height: 36px;
   padding: 7px 15px 8px 16px;
   border-radius: $radius-full;
