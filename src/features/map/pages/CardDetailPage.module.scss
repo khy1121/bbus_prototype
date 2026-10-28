@@ -15,7 +15,7 @@ $glass-pressed: linear-gradient(78.16deg, rgba(202, 202, 202, 0.65) 1.2%, rgba(2
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
+  height: 46px; // Figma: 상태바 아래 5px 에 36px 버튼
   padding: env(safe-area-inset-top, 0px) 25px 0;
   background: var(--color-coral-background);
   box-sizing: content-box;
@@ -25,8 +25,8 @@ $glass-pressed: linear-gradient(78.16deg, rgba(202, 202, 202, 0.65) 1.2%, rgba(2
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  @include typo('body-l');
-  color: var(--color-black);
+  @include typo('body-l-bold');
+  color: var(--color-gray-800);
   white-space: nowrap;
 }
 
@@ -59,7 +59,7 @@ $glass-pressed: linear-gradient(78.16deg, rgba(202, 202, 202, 0.65) 1.2%, rgba(2
   gap: 20px;
   max-width: 390px;
   margin: 0 auto;
-  padding: 15px 25px 0;
+  padding: 14px 25px 0; // Figma: 제목 블록이 상태바 아래 60px
 }
 
 .summary {

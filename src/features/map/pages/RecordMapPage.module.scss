@@ -15,12 +15,13 @@ $glass: linear-gradient(28.69deg, rgba(255, 255, 255, 0.65) 1.2%, rgba(255, 255,
   inset: 0;
 }
 
+// z-index 를 두지 않아 자식(헤더·검색창)이 페이지 기준으로 쌓인다
+// → 폴라로이드 오버레이(11)가 검색창·토글(10) 위, 헤더(12) 아래에 깔린다 (Figma 10:15138)
 .top {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,6 +36,7 @@ $glass: linear-gradient(28.69deg, rgba(255, 255, 255, 0.65) 1.2%, rgba(255, 255,
 // ---------- Header (10:14499) ----------
 .header {
   position: relative;
+  z-index: 12;
   width: 100%;
   height: calc(#{$header-h} + #{$safe-top});
   padding: calc(#{$safe-top}) 25px 0;
@@ -75,6 +77,8 @@ $glass: linear-gradient(28.69deg, rgba(255, 255, 255, 0.65) 1.2%, rgba(255, 255,
 
 // ---------- Search (10:15696) ----------
 .search {
+  position: relative;
+  z-index: 10;
   width: calc(100% - 50px);
   max-width: 340px;
 }
@@ -109,7 +113,7 @@ $glass: linear-gradient(28.69deg, rgba(255, 255, 255, 0.65) 1.2%, rgba(255, 255,
 .toggle {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--bottom-nav-height) + 44px + var(--safe-bottom));
+  bottom: calc(var(--bottom-nav-height) + 61px + var(--safe-bottom)); // Figma: 하단 바 위 61px
   z-index: 10;
   transform: translateX(-50%);
 }

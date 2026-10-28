@@ -22,7 +22,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 0 0 12px 12px;
+  border-radius: 12px; // Figma: 상태바 아래 미리보기 위·아래 모두 둥글게
 
   @include desktop {
     width: 100%;
