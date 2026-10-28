@@ -5,19 +5,26 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import svgr from 'vite-plugin-svgr'
 import { handleDirectionsRequest } from './src/lib/kakao/directions.js'
+import { handleRestStopsRequest } from './src/lib/kakao/restStops.js'
 
-/** 개발 서버에서 Vercel 함수(/api/directions)와 같은 동작을 제공 */
-function directionsDevApi(restApiKey: string | undefined): Plugin {
+/** 개발 서버에서 Vercel 함수(/api/directions, /api/rest-stops)와 같은 동작을 제공 */
+function kakaoDevApi(restApiKey: string | undefined): Plugin {
+  const handlers = {
+    '/api/directions': handleDirectionsRequest,
+    '/api/rest-stops': handleRestStopsRequest,
+  }
   return {
-    name: 'bbus-directions-dev-api',
+    name: 'bbus-kakao-dev-api',
     configureServer(server) {
-      server.middlewares.use('/api/directions', async (req, res) => {
-        const search = new URL(req.url ?? '', 'http://localhost').searchParams
-        const { status, body } = await handleDirectionsRequest(search, restApiKey)
-        res.statusCode = status
-        res.setHeader('Content-Type', 'application/json; charset=utf-8')
-        res.end(JSON.stringify(body))
-      })
+      for (const [path, handle] of Object.entries(handlers)) {
+        server.middlewares.use(path, async (req, res) => {
+          const search = new URL(req.url ?? '', 'http://localhost').searchParams
+          const { status, body } = await handle(search, restApiKey)
+          res.statusCode = status
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          res.end(JSON.stringify(body))
+        })
+      }
     },
   }
 }
@@ -31,7 +38,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       svgr(),
-      directionsDevApi(env.KAKAO_REST_API_KEY),
+      kakaoDevApi(env.KAKAO_REST_API_KEY),
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: false, // main.tsx 에서 직접 등록
