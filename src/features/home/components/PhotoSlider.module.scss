@@ -1,0 +1,57 @@
+.slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  @include hide-scrollbar;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-coral);
+    outline-offset: -2px;
+  }
+}
+
+.slide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  cursor: zoom-in;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Figma 10:6457 — 글래스 블랙 pill
+.counter {
+  position: absolute;
+  right: 25px;
+  bottom: 59px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 51px;
+  height: 23px;
+  padding: 3px 14px 2px 15px;
+  border-radius: $radius-full;
+  background: linear-gradient(
+    55.69deg,
+    rgba(0, 0, 0, 0.24) 10.87%,
+    rgba(0, 0, 0, 0.12) 57.44%,
+    rgba(0, 0, 0, 0.24) 89.39%
+  );
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  @include typo('caption');
+  color: var(--color-white);
+  white-space: nowrap;
+  pointer-events: none;
+}
